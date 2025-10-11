@@ -248,9 +248,7 @@ const Registration: React.FC = () => {
       <div className="w-full max-w-md space-y-6">
         <div className="text-center">
           <div className="flex items-center justify-center mb-4">
-            <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center text-white text-2xl font-bold">
-              🎓
-            </div>
+            <img src="/logo_all.png" alt="City University Logo" />
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             City University

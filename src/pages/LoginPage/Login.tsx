@@ -41,10 +41,11 @@ const Login: React.FC = () => {
   // Function to get the dashboard route based on role
   const getDashboardRoute = (role: string): string => {
     const roleRoutes: { [key: string]: string } = {
-      accounts: "/accounts-dashboard",
+      account: "/accounts-dashboard",
       faculty: "/faculty-dashboard",
+      library: "/library-dashboard",
       student: "/student-dashboard",
-      exam: "/exam-controller-dashboard",
+      "exam-controller": "/exam-controller-dashboard",
     };
     return roleRoutes[role] || "/dashboard";
   };
@@ -271,12 +272,12 @@ const Login: React.FC = () => {
                   required
                 >
                   <option value="">Select your role</option>
-                  <option value="accounts">Accounts</option>
+                  <option value="account">Accounts</option>
                   <option value="faculty">Faculty</option>
                   <option value="library">Library</option>
                   <option value="student">Student</option>
                   <option value="registrar">Registrar</option>
-                  <option value="exam">Exam controller</option>
+                  <option value="exam-controller">Exam controller</option>
                 </select>
                 {errors.role && (
                   <p className="text-sm text-red-500">{errors.role}</p>

@@ -25,15 +25,18 @@ function App() {
           <Route index element={<ApplicationsList role={"faculty"} />} />
           <Route path="application/:id" element={<ApplicationDetails />} />
         </Route>
-        {/* <Route path="/accounts-dashboard" element={<AccountDashboard />}>
+        <Route path="/accounts-dashboard" element={<FacultyDashboard />}>
           <Route index element={<ApplicationsList role={"accounts"} />} />
-        </Route> */}
-        {/* <Route path="/department-dashboard" element={<AccountDashboard />}>
-          <Route index element={<AllApplicationsList />} />
-        </Route> */}
-        {/* <Route path="/exam-controller-dashboard" element={<AccountDashboard />}>
-          <Route index element={<AllApplicationsList />} />
-        </Route> */}
+          <Route path="application/:id" element={<ApplicationDetails />} />
+        </Route>
+        <Route path="/exam-controller-dashboard" element={<FacultyDashboard />}>
+          <Route index element={<ApplicationsList role={"examController"} />} />
+          <Route path="application/:id" element={<ApplicationDetails />} />
+        </Route>
+        <Route path="/library-dashboard" element={<FacultyDashboard />}>
+          <Route index element={<ApplicationsList role={"library"} />} />
+          <Route path="application/:id" element={<ApplicationDetails />} />
+        </Route>
 
         <Route path="/certificate" element={<CertificateApplicationForm />} />
       </Routes>

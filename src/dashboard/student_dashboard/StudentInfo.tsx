@@ -3,12 +3,14 @@ import { useEffect, useState } from "react";
 
 // Interface matching your MongoDB schema
 interface Student {
+  _id: string;
   name: string;
   email: string;
   phone: string;
   studentId: string;
   department: string;
   image?: string;
+  isApplied?: boolean;
 }
 
 const StudentInfo = () => {
@@ -18,39 +20,29 @@ const StudentInfo = () => {
   const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
-  // Fetch student data from API
+  // Fetch student data from localStorage
   useEffect(() => {
-    const fetchStudentData = async () => {
+    const fetchStudentData = () => {
       try {
         setIsLoading(true);
 
-        // Get token from localStorage
-        const authToken = localStorage.getItem("authToken");
+        // Get userData from localStorage
+        const userData = localStorage.getItem("userData");
 
-        if (!authToken) {
-          throw new Error("No authentication token found");
+        if (!userData) {
+          throw new Error("No user data found. Please login again.");
         }
 
-        const response = await fetch(
-          "https://server-side-rho-snowy.vercel.app/student/profile",
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${authToken}`,
-            },
-          }
-        );
+        // Parse the JSON data
+        const parsedData = JSON.parse(userData);
 
-        if (!response.ok) {
-          if (response.status === 401) {
-            throw new Error("Authentication failed. Please login again.");
-          }
-          throw new Error("Failed to fetch student data");
+        // Check if student data exists
+        if (!parsedData.data) {
+          throw new Error("Student information not found");
         }
 
-        const data = await response.json();
-        setStudentData(data.student);
+        // Set the student data
+        setStudentData(parsedData.data);
         setError(null);
       } catch (err) {
         console.error("Error fetching student data:", err);
@@ -76,9 +68,14 @@ const StudentInfo = () => {
 
       // Get token from localStorage
       const authToken = localStorage.getItem("authToken");
+      const userData = localStorage.getItem("userData");
 
       if (!authToken) {
         throw new Error("No authentication token found");
+      }
+
+      if (!userData) {
+        throw new Error("No user data found");
       }
 
       const response = await fetch(
@@ -89,7 +86,12 @@ const StudentInfo = () => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${authToken}`,
           },
-          body: JSON.stringify(studentData),
+          body: JSON.stringify({
+            name: studentData.name,
+            email: studentData.email,
+            phone: studentData.phone,
+            department: studentData.department,
+          }),
         }
       );
 
@@ -100,8 +102,14 @@ const StudentInfo = () => {
         throw new Error("Failed to update profile");
       }
 
-      const updatedData = await response.json();
-      setStudentData(updatedData);
+      const result = await response.json();
+
+      // Update localStorage with new data
+      const parsedUserData = JSON.parse(userData);
+      parsedUserData.data = { ...studentData, ...result.data };
+      localStorage.setItem("userData", JSON.stringify(parsedUserData));
+
+      setStudentData(parsedUserData.data);
       setIsEditing(false);
       alert("Profile updated successfully!");
     } catch (err) {
@@ -113,6 +121,19 @@ const StudentInfo = () => {
       );
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  // Cancel editing and restore original data
+  const handleCancel = () => {
+    setIsEditing(false);
+    // Reload data from localStorage
+    const userData = localStorage.getItem("userData");
+    if (userData) {
+      const parsedData = JSON.parse(userData);
+      if (parsedData.data) {
+        setStudentData(parsedData.data);
+      }
     }
   };
 
@@ -182,14 +203,17 @@ const StudentInfo = () => {
         {/* Profile Header */}
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 mb-6 pb-6 border-b border-gray-200">
           <div className="relative">
-            <img
-              src={
-                studentData.image ||
-                `https://api.dicebear.com/7.x/avataaars/svg?seed=${studentData.name}`
-              }
-              alt="Student Avatar"
-              className="w-24 h-24 rounded-full border-4 border-blue-100 shadow-sm object-cover"
-            />
+            {studentData.image && studentData.image !== "abc.jpg" ? (
+              <img
+                src={studentData.image}
+                alt={studentData.name}
+                className="w-24 h-24 rounded-full border-4 border-blue-100 shadow-sm object-cover"
+              />
+            ) : (
+              <div className="w-24 h-24 rounded-full border-4 border-blue-100 shadow-sm bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
+                <User className="w-12 h-12 text-white" />
+              </div>
+            )}
             <button className="absolute bottom-0 right-0 p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors shadow-lg">
               <svg
                 className="w-4 h-4"
@@ -227,11 +251,16 @@ const StudentInfo = () => {
               <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
                 {studentData.department}
               </span>
+              {studentData.isApplied && (
+                <span className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-medium">
+                  Applied
+                </span>
+              )}
             </div>
           </div>
 
           <button
-            onClick={() => setIsEditing(!isEditing)}
+            onClick={() => (isEditing ? handleCancel() : setIsEditing(true))}
             disabled={isSaving}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
@@ -383,7 +412,7 @@ const StudentInfo = () => {
                 )}
               </button>
               <button
-                onClick={() => setIsEditing(false)}
+                onClick={handleCancel}
                 disabled={isSaving}
                 className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
