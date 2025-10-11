@@ -42,9 +42,9 @@ const Login: React.FC = () => {
   const getDashboardRoute = (role: string): string => {
     const roleRoutes: { [key: string]: string } = {
       accounts: "/accounts-dashboard",
-      department: "/department-dashboard",
+      faculty: "/faculty-dashboard",
       student: "/student-dashboard",
-      examcontroller: "/exam-controller-dashboard",
+      exam: "/exam-controller-dashboard",
     };
     return roleRoutes[role] || "/dashboard";
   };
@@ -106,11 +106,11 @@ const Login: React.FC = () => {
       const submitData = {
         email: loginData.email,
         password: loginData.password,
-        role: loginData.role,
+        // role: loginData.role,
       };
 
       const response = await fetch(
-        "https://server-side-rho-snowy.vercel.app/student/login",
+        `https://server-side-rho-snowy.vercel.app/${loginData.role}/login`,
         {
           method: "POST",
           headers: {
@@ -129,8 +129,9 @@ const Login: React.FC = () => {
         if (result) {
           localStorage.setItem("authToken", result.data.token);
         }
-        if (result.user) {
-          localStorage.setItem("userData", JSON.stringify(result.user));
+        if (result) {
+          console.log(result.data);
+          localStorage.setItem("userData", JSON.stringify(result.data));
         }
 
         // Store the user role
@@ -271,9 +272,11 @@ const Login: React.FC = () => {
                 >
                   <option value="">Select your role</option>
                   <option value="accounts">Accounts</option>
-                  <option value="department">Department</option>
+                  <option value="faculty">Faculty</option>
+                  <option value="library">Library</option>
                   <option value="student">Student</option>
-                  <option value="examcontroller">Exam controller</option>
+                  <option value="registrar">Registrar</option>
+                  <option value="exam">Exam controller</option>
                 </select>
                 {errors.role && (
                   <p className="text-sm text-red-500">{errors.role}</p>

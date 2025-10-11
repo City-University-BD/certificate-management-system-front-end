@@ -1,9 +1,10 @@
 import { Route, Routes } from "react-router";
-import AccountDashboard from "./dashboard/account_dashboard/AccountDashboard";
+import FacultyDashboard from "./dashboard/faculty_dashboard/FacultyDashboard";
 import StatusCheck from "./dashboard/student_dashboard/StatusCheck";
 import StudentDashboard from "./dashboard/student_dashboard/StudentDashboard";
 import StudentInfo from "./dashboard/student_dashboard/StudentInfo";
-import AllApplicationsList from "./pages/applicaitonList/AllApplicationsList";
+import ApplicationsList from "./pages/applicaitonList/ApplicationsList";
+import ApplicationDetails from "./pages/applicationDetails/ApplicationDetails";
 import CertificateApplicationForm from "./pages/certificatePage/CertificateApplication";
 import Login from "./pages/LoginPage/Login";
 import Registration from "./pages/RegistrationPage/Registration";
@@ -20,16 +21,19 @@ function App() {
           <Route path="certificate" element={<CertificateApplicationForm />} />
           <Route path="status" element={<StatusCheck />} />
         </Route>
-        <Route path="/accounts-dashboard" element={<AccountDashboard />}>
-          <Route index element={<AllApplicationsList />} />
+        <Route path="/faculty-dashboard" element={<FacultyDashboard />}>
+          <Route index element={<ApplicationsList role={"faculty"} />} />
+          <Route path="application/:id" element={<ApplicationDetails />} />
         </Route>
-        <Route path="/department-dashboard" element={<AccountDashboard />}>
+        {/* <Route path="/accounts-dashboard" element={<AccountDashboard />}>
+          <Route index element={<ApplicationsList role={"accounts"} />} />
+        </Route> */}
+        {/* <Route path="/department-dashboard" element={<AccountDashboard />}>
           <Route index element={<AllApplicationsList />} />
-        </Route>
-        <Route path="/exam-controller-dashboard" element={<AccountDashboard />}>
+        </Route> */}
+        {/* <Route path="/exam-controller-dashboard" element={<AccountDashboard />}>
           <Route index element={<AllApplicationsList />} />
-        </Route>
-        <Route path="/faculty-dashboard" element={<StudentDashboard />}></Route>
+        </Route> */}
 
         <Route path="/certificate" element={<CertificateApplicationForm />} />
       </Routes>
