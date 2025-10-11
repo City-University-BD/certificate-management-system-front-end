@@ -83,12 +83,13 @@ const FacultyDashboard = () => {
         <aside
           className={`${
             isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-          } lg:translate-x-0 fixed lg:sticky top-20 left-0 h-[calc(100vh-4rem)] w-64 bg-white border-r border-gray-200 transition-transform duration-300 z-30 overflow-y-auto`}
+          } lg:translate-x-0 fixed lg:sticky top-20 left-0 h-[calc(100vh-5rem)] w-64 bg-white border-r border-gray-200 transition-transform duration-300 z-30 flex flex-col`}
         >
+          {/* Navigation Menu */}
           <nav className="p-4 space-y-1">
             <button
               onClick={() => navigate("/faculty-dashboard")}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+              className={`w-full flex items-center gap-3 px-4 py-3 hover:cursor-pointer rounded-lg transition-colors ${
                 isActive("/faculty-dashboard")
                   ? "bg-blue-50 text-blue-700"
                   : "text-gray-700 hover:bg-gray-50"
@@ -99,54 +100,59 @@ const FacultyDashboard = () => {
             </button>
           </nav>
 
-          {/* Faculty Information */}
-          <div className="p-4 border-t border-gray-200">
-            <p className="font-semibold text-gray-900 mb-3">My Information</p>
+          {/* Faculty Information - Grows to fill space */}
+          <div className="flex-1 overflow-y-auto p-4 border-t border-gray-200">
+            <p className="font-semibold text-center text-gray-900 mb-3">
+              My Information
+            </p>
             {facultyInfo ? (
-              <div className="space-y-3">
-                <div className="flex items-center gap-3">
+              <div className="space-y-4">
+                {/* Profile Section */}
+                <div className="flex flex-col items-center text-center pb-3 border-b border-gray-100">
                   {facultyInfo.image && facultyInfo.image !== "johndoe.jpg" ? (
                     <img
                       src={facultyInfo.image}
                       alt={facultyInfo.name}
-                      className="w-12 h-12 rounded-full object-cover border-2 border-gray-200"
+                      className="w-16 h-16 rounded-full object-cover border-2 border-blue-200 mb-2"
                     />
                   ) : (
-                    <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-                      <User className="w-6 h-6 text-blue-600" />
+                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center mb-2">
+                      <User className="w-8 h-8 text-white" />
                     </div>
                   )}
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 truncate">
-                      {facultyInfo.name}
-                    </p>
-                    <p className="text-xs text-gray-500 capitalize">
-                      {facultyInfo.designation}
-                    </p>
-                  </div>
+                  <p className="text-sm font-semibold text-gray-900">
+                    {facultyInfo.name}
+                  </p>
+                  <p className="text-xs text-gray-500 capitalize">
+                    {facultyInfo.designation}
+                  </p>
                 </div>
 
-                <div className="space-y-2 text-xs">
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">Faculty ID:</span>
-                    <span className="font-medium text-gray-900">
+                {/* Details Section */}
+                <div className="space-y-3 text-xs">
+                  <div className="bg-gray-50 p-2 rounded-lg">
+                    <p className="text-gray-500 mb-1">Faculty ID</p>
+                    <p className="font-semibold text-gray-900">
                       {facultyInfo.facultyId}
-                    </span>
+                    </p>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">Department:</span>
-                    <span className="font-medium text-gray-900 uppercase">
+
+                  <div className="bg-gray-50 p-2 rounded-lg">
+                    <p className="text-gray-500 mb-1">Department</p>
+                    <p className="font-semibold text-gray-900 uppercase">
                       {facultyInfo.department}
-                    </span>
+                    </p>
                   </div>
-                  <div className="pt-2 border-t border-gray-100">
-                    <p className="text-gray-500 mb-1">Email:</p>
+
+                  <div className="bg-gray-50 p-2 rounded-lg">
+                    <p className="text-gray-500 mb-1">Email</p>
                     <p className="font-medium text-gray-900 break-all">
                       {facultyInfo.email}
                     </p>
                   </div>
-                  <div>
-                    <p className="text-gray-500 mb-1">Phone:</p>
+
+                  <div className="bg-gray-50 p-2 rounded-lg">
+                    <p className="text-gray-500 mb-1">Phone</p>
                     <p className="font-medium text-gray-900">
                       {facultyInfo.phone}
                     </p>
@@ -154,18 +160,23 @@ const FacultyDashboard = () => {
                 </div>
               </div>
             ) : (
-              <div className="text-sm text-gray-500 text-center py-4">
-                No information available
+              <div className="flex flex-col items-center justify-center py-8">
+                <User className="w-12 h-12 text-gray-300 mb-2" />
+                <p className="text-sm text-gray-500 text-center">
+                  No information available
+                </p>
               </div>
             )}
           </div>
-          <div className="pt-4 mt-4 border-t border-gray-200">
+
+          {/* Logout Button - Sticky at bottom */}
+          <div className="p-4 border-t border-gray-200 bg-white">
             <button
               onClick={handleLogout}
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 transition-colors"
+              className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-lg text-red-600 bg-red-100 hover:bg-red-300 transition-all hover:shadow-sm font-medium hover:cursor-pointer"
             >
               <LogOut className="w-5 h-5" />
-              <span className="font-medium">Logout</span>
+              <span>Logout</span>
             </button>
           </div>
         </aside>
