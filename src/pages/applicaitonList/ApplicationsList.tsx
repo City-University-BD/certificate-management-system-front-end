@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Eye, Loader2, Search, XCircle } from "lucide-react";
+import { Eye, Filter, Loader2, Search, XCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 
@@ -162,7 +162,7 @@ const ApplicationsList = ({ role }: { role: string }) => {
                 className="pl-10"
               />
             </div>
-            {/* <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2">
               <Filter className="text-gray-400 w-5 h-5" />
               <select
                 value={filterStatus}
@@ -170,12 +170,11 @@ const ApplicationsList = ({ role }: { role: string }) => {
                 className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="all">All Status</option>
-                <option value="0">Pending</option>
                 <option value="1">In Progress</option>
                 <option value="2">Approved</option>
                 <option value="3">Rejected</option>
               </select>
-            </div> */}
+            </div>
           </div>
         </CardContent>
       </Card>

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -9,6 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Loader2 } from "lucide-react";
 import { useState } from "react";
 
 interface FormData {
@@ -59,7 +61,6 @@ const Registration: React.FC = () => {
       [name]: files ? files[0] : value,
     }));
 
-    // Clear specific error when user starts typing
     if (errors[name as keyof FormErrors]) {
       setErrors((prev) => ({
         ...prev,
@@ -71,7 +72,6 @@ const Registration: React.FC = () => {
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
 
-    // Required field validation
     if (!formData.name.trim()) newErrors.name = "Name is required";
     if (!formData.email.trim()) newErrors.email = "Email is required";
     if (!formData.phone.trim()) newErrors.phone = "Phone is required";
@@ -83,23 +83,19 @@ const Registration: React.FC = () => {
     if (!formData.confirmPassword)
       newErrors.confirmPassword = "Please confirm your password";
 
-    // Password validation
     if (formData.password && formData.password.length < 6) {
       newErrors.password = "Password must be at least 6 characters";
     }
 
-    // Password confirmation
     if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = "Passwords do not match";
     }
 
-    // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (formData.email && !emailRegex.test(formData.email)) {
       newErrors.email = "Please enter a valid email address";
     }
 
-    // Phone validation (basic - adjust based on your requirements)
     const phoneRegex = /^[0-9+\-\s()]{10,}$/;
     if (formData.phone && !phoneRegex.test(formData.phone)) {
       newErrors.phone = "Please enter a valid phone number";
@@ -121,7 +117,6 @@ const Registration: React.FC = () => {
     setSuccessMessage("");
 
     try {
-      // Create the payload matching the database schema
       const submitData = {
         name: formData.name.trim(),
         email: formData.email.trim().toLowerCase(),
@@ -129,10 +124,7 @@ const Registration: React.FC = () => {
         studentId: formData.studentId.trim(),
         password: formData.password,
         department: formData.department,
-        // image is optional, so we'll handle it separately if needed
       };
-
-      console.log("Submitting student registration:", submitData);
 
       const response = await fetch(
         "https://server-side-rho-snowy.vercel.app/student/register",
@@ -146,18 +138,17 @@ const Registration: React.FC = () => {
       );
 
       if (response.ok) {
-        // Try to parse JSON response
         let result;
         try {
           result = await response.json();
         } catch (jsonError) {
-          // If JSON parsing fails but response is ok, assume success
+          console.log(jsonError);
           result = { success: true };
         }
+        console.log(result);
 
         setSuccessMessage("Registration successful! You can now sign in.");
 
-        // Reset form
         setFormData({
           name: "",
           email: "",
@@ -169,25 +160,21 @@ const Registration: React.FC = () => {
           image: null,
         });
 
-        // Clear file input
         const fileInput = document.getElementById("image") as HTMLInputElement;
         if (fileInput) {
           fileInput.value = "";
         }
 
-        // Redirect to login page after a short delay
         setTimeout(() => {
           window.location.href = "/";
         }, 2000);
       } else {
-        // Handle non-200 responses
         let errorMessage = "Registration failed. Please try again.";
 
         try {
           const result = await response.json();
 
           if (result.errors && Array.isArray(result.errors)) {
-            // Handle field-specific errors
             const serverErrors: FormErrors = {};
             result.errors.forEach((error: any) => {
               if (error.field && error.message) {
@@ -200,7 +187,7 @@ const Registration: React.FC = () => {
             errorMessage = result.message;
           }
         } catch (jsonError) {
-          // If we can't parse JSON, use status-based error messages
+          console.log(jsonError);
           switch (response.status) {
             case 400:
               errorMessage =
@@ -245,6 +232,19 @@ const Registration: React.FC = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-8">
+      {/* Loading Overlay */}
+      {isLoading && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-8 flex flex-col items-center space-y-4">
+            <Loader2 className="h-12 w-12 animate-spin text-blue-600" />
+            <p className="text-lg font-medium text-gray-900">
+              Creating your account...
+            </p>
+            <p className="text-sm text-gray-500">Please wait</p>
+          </div>
+        </div>
+      )}
+
       <div className="w-full max-w-md space-y-6">
         <div className="text-center">
           <div className="flex items-center justify-center mb-4">
@@ -453,7 +453,14 @@ const Registration: React.FC = () => {
               onClick={handleSubmit}
               disabled={isLoading}
             >
-              {isLoading ? "Creating Account..." : "Create Student Account"}
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Creating Account...
+                </>
+              ) : (
+                "Create Student Account"
+              )}
             </Button>
             <div className="text-center text-sm">
               Already have an account?{" "}
