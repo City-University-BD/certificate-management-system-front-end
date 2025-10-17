@@ -1,6 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import {
   ArrowLeft,
   BookOpen,
   Calendar,
@@ -15,6 +23,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
+import { toast } from "sonner";
 
 interface ClearanceItem {
   status: number;
@@ -57,12 +66,15 @@ interface ApplicationData {
   };
 }
 
-const ApplicationDetails = () => {
+const ApplicationDetails = ({ role }: { role: string }) => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [application, setApplication] = useState<ApplicationData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [rejectMessage, setRejectMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const fetchApplicationDetails = async () => {
@@ -104,6 +116,93 @@ const ApplicationDetails = () => {
 
   const handleGoBack = () => {
     navigate(-1);
+  };
+
+  const handleApprove = async () => {
+    if (!id) return;
+
+    try {
+      setIsSubmitting(true);
+
+      const res = await fetch(
+        `https://server-side-rho-snowy.vercel.app/application/clearance/${role}/${id}`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: 1, message: "" }),
+        }
+      );
+
+      const data = await res.json();
+      if (res.ok) {
+        toast.success("Application approved successfully ✅");
+        setApplication((prev) =>
+          prev
+            ? {
+                ...prev,
+                clearance: {
+                  ...prev.clearance,
+                  faculty: {
+                    ...prev.clearance.faculty,
+                    status: 1,
+                    message: "",
+                  },
+                },
+              }
+            : prev
+        );
+      } else {
+        throw new Error(data.message || "Approval failed");
+      }
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Something went wrong");
+      console.log("data:", err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleReject = async () => {
+    if (!id) return;
+    try {
+      setIsSubmitting(true);
+      const res = await fetch(
+        `https://server-side-rho-snowy.vercel.app/application/clearance/faculty/${id}`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: -1, message: rejectMessage }),
+        }
+      );
+
+      const data = await res.json();
+      if (res.ok) {
+        toast.success("Application rejected ❌");
+        setApplication((prev) =>
+          prev
+            ? {
+                ...prev,
+                clearance: {
+                  ...prev.clearance,
+                  faculty: {
+                    ...prev.clearance.faculty,
+                    status: -1,
+                    message: rejectMessage,
+                  },
+                },
+              }
+            : prev
+        );
+        setShowRejectModal(false);
+        setRejectMessage("");
+      } else {
+        throw new Error(data.message || "Rejection failed");
+      }
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Something went wrong");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const getApplicationType = (type: number) => {
@@ -484,18 +583,35 @@ const ApplicationDetails = () => {
       <Card>
         <CardContent className="pt-6">
           <div className="flex flex-wrap gap-3">
-            <Button className="bg-green-600 hover:bg-green-700">
-              <CheckCircle className="w-4 h-4 mr-2" />
+            <Button
+              onClick={handleApprove}
+              disabled={isSubmitting}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              {isSubmitting ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <CheckCircle className="w-4 h-4 mr-2" />
+              )}
               Approve Application
             </Button>
-            <Button variant="destructive">
+
+            <Button
+              onClick={() => setShowRejectModal(true)}
+              variant="destructive"
+              disabled={isSubmitting}
+            >
               <XCircle className="w-4 h-4 mr-2" />
               Reject Application
             </Button>
-            <Button variant="outline">
-              <FileText className="w-4 h-4 mr-2" />
-              Download Details
-            </Button>
+
+            {role === "examController" && (
+              <Button variant="outline">
+                <FileText className="w-4 h-4 mr-2" />
+                Download Details
+              </Button>
+            )}
+
             <Button
               variant="outline"
               onClick={handleGoBack}
@@ -507,6 +623,37 @@ const ApplicationDetails = () => {
           </div>
         </CardContent>
       </Card>
+
+      <Dialog open={showRejectModal} onOpenChange={setShowRejectModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Reject Application</DialogTitle>
+          </DialogHeader>
+          <Textarea
+            placeholder="Enter rejection reason..."
+            value={rejectMessage}
+            onChange={(e) => setRejectMessage(e.target.value)}
+            className="min-h-[100px]"
+          />
+          <DialogFooter className="mt-4">
+            <Button variant="outline" onClick={() => setShowRejectModal(false)}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleReject}
+              disabled={isSubmitting || !rejectMessage.trim()}
+            >
+              {isSubmitting ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <XCircle className="w-4 h-4 mr-2" />
+              )}
+              Reject
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

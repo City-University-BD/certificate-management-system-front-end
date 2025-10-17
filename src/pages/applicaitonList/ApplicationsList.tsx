@@ -25,7 +25,7 @@ interface Application {
   };
 }
 
-const ApplicationsList = ({ role }: { role: string }) => {
+const ApplicationsList = ({ role, url }: { role: string; url: string }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [applications, setApplications] = useState<Application[]>([]);
@@ -256,7 +256,7 @@ const ApplicationsList = ({ role }: { role: string }) => {
                 <div className="flex flex-col gap-2 lg:min-w-[180px]">
                   <Button variant="outline" className="w-full justify-start">
                     <Eye className="w-4 h-4 mr-2" />
-                    <Link to={`/faculty-dashboard/application/${app._id}`}>
+                    <Link to={`${url}/application/${app._id}`}>
                       View Details
                     </Link>
                   </Button>

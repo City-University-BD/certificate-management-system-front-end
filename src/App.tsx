@@ -28,31 +28,66 @@ function App() {
           path="/exam-controller-dashboard"
           element={<FacultyDashboard dashboard={"Exam Controller Dashboard"} />}
         >
-          <Route index element={<ApplicationsList role={"examController"} />} />
-          <Route path="application/:id" element={<ApplicationDetails />} />
+          <Route
+            index
+            element={
+              <ApplicationsList
+                role={"examController"}
+                url={"/exam-controller-dashboard"}
+              />
+            }
+          />
+          <Route
+            path="application/:id"
+            element={<ApplicationDetails role={"examController"} />}
+          />
         </Route>
 
         <Route
           path="/faculty-dashboard"
-          element={<FacultyDashboard dashboard={"Exam Controller Dashboard"} />}
+          element={<FacultyDashboard dashboard={"Faculty Dashboard"} />}
         >
-          <Route index element={<ApplicationsList role={"faculty"} />} />
-          <Route path="application/:id" element={<ApplicationDetails />} />
+          <Route
+            index
+            element={
+              <ApplicationsList role={"faculty"} url={"/faculty-dashboard"} />
+            }
+          />
+          <Route
+            path="application/:id"
+            element={<ApplicationDetails role={"faculty"} />}
+          />
         </Route>
         <Route
           path="/accounts-dashboard"
-          element={<FacultyDashboard dashboard={"Exam Controller Dashboard"} />}
+          element={<FacultyDashboard dashboard={"Accounts Dashboard"} />}
         >
-          <Route index element={<ApplicationsList role={"accounts"} />} />
-          <Route path="application/:id" element={<ApplicationDetails />} />
+          <Route
+            index
+            element={
+              <ApplicationsList role={"accounts"} url={"/accounts-dashboard"} />
+            }
+          />
+          <Route
+            path="application/:id"
+            element={<ApplicationDetails role={"accounts"} />}
+          />
         </Route>
 
         <Route
           path="/library-dashboard"
           element={<FacultyDashboard dashboard={"Exam Controller Dashboard"} />}
         >
-          <Route index element={<ApplicationsList role={"library"} />} />
-          <Route path="application/:id" element={<ApplicationDetails />} />
+          <Route
+            index
+            element={
+              <ApplicationsList role={"library"} url={"/library-dashboard"} />
+            }
+          />
+          <Route
+            path="application/:id"
+            element={<ApplicationDetails role={"library"} />}
+          />
         </Route>
 
         <Route path="/certificate" element={<CertificateApplicationForm />} />
