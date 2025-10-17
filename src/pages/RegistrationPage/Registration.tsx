@@ -311,7 +311,7 @@ const Registration: React.FC = () => {
                 <p className="text-sm text-red-500">{errors.email}</p>
               )}
               <p className="text-xs text-gray-500">
-                This email must be unique across all students
+                This email must be match with your orbund email
               </p>
             </div>
 
@@ -341,7 +341,7 @@ const Registration: React.FC = () => {
                 id="studentId"
                 name="studentId"
                 type="text"
-                placeholder="STU2024001"
+                placeholder="Enter your orbund student ID"
                 value={formData.studentId}
                 onChange={handleInputChange}
                 className={errors.studentId ? "border-red-500" : ""}
@@ -351,7 +351,7 @@ const Registration: React.FC = () => {
                 <p className="text-sm text-red-500">{errors.studentId}</p>
               )}
               <p className="text-xs text-gray-500">
-                Your unique student identification number
+                Your Id must be match with orbund student ID
               </p>
             </div>
 

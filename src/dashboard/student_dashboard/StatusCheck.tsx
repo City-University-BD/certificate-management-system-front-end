@@ -246,7 +246,17 @@ const StatusCheck = () => {
       {/* Page Header */}
       <div>
         <h1 className="text-3xl font-bold text-gray-900">Application Status</h1>
-        <p className="text-gray-600 mt-1">Track your certificate application</p>
+        <div className="flex justify-between">
+          <p className="text-gray-600 mt-1">
+            Track your certificate application
+          </p>
+          <p className="text-gray-600 mt-1 text-right">
+            Your tracking Id:{" "}
+            <span className="hover:cursor-pointer hover:underline text-blue-500">
+              {application?._id}
+            </span>
+          </p>
+        </div>
       </div>
 
       {/* Application Overview */}
