@@ -1,7 +1,7 @@
 import { Building2, Hash, Loader2, Mail, Phone, User } from "lucide-react";
 import { useEffect, useState } from "react";
 
-// Interface matching your MongoDB schema
+// Interface
 interface Student {
   _id: string;
   name: string;
@@ -318,20 +318,10 @@ const StudentInfo = () => {
                 <Mail className="w-4 h-4" />
                 Email Address
               </label>
-              {isEditing ? (
-                <input
-                  type="email"
-                  value={studentData.email}
-                  onChange={(e) =>
-                    setStudentData({ ...studentData, email: e.target.value })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              ) : (
-                <p className="text-gray-900 font-medium bg-gray-50 px-3 py-2 rounded-lg">
-                  {studentData.email}
-                </p>
-              )}
+              <p className="text-gray-900 font-medium bg-gray-50 px-3 py-2 rounded-lg">
+                {studentData.email}
+              </p>
+              <p className="text-xs text-gray-500">Email cannot be changed</p>
             </div>
 
             {/* Phone Field */}

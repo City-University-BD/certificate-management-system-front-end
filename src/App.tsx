@@ -7,6 +7,7 @@ import ApplicationsList from "./pages/applicaitonList/ApplicationsList";
 import ApplicationDetails from "./pages/applicationDetails/ApplicationDetails";
 import CertificateApplicationForm from "./pages/certificatePage/CertificateApplication";
 import Login from "./pages/LoginPage/Login";
+import SSLPaymentPage from "./pages/payment/SSLPaymentPage";
 import Registration from "./pages/RegistrationPage/Registration";
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
           <Route index element={<StudentInfo />} />
           <Route path="certificate" element={<CertificateApplicationForm />} />
           <Route path="status" element={<StatusCheck />} />
+          <Route path="payment" element={<SSLPaymentPage />} />
         </Route>
         <Route path="/faculty-dashboard" element={<FacultyDashboard />}>
           <Route index element={<ApplicationsList role={"faculty"} />} />
