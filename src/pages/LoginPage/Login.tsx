@@ -295,6 +295,7 @@ const Login: React.FC = () => {
               {isLoading ? "Signing in..." : "Login"}
             </Button>
             <div className="text-center text-sm">
+              Are you student? Only student can create an account. <br />
               Don't have an account?{" "}
               <a
                 href="/registration"

@@ -8,6 +8,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 import {
   ArrowLeft,
   BookOpen,
@@ -236,6 +238,25 @@ const ApplicationDetails = ({ role }: { role: string }) => {
       </span>
     );
   };
+  const handleDownloadPDF = async () => {
+    const element = document.getElementById("application-details");
+    if (!element) return;
+
+    const originalBg = element.style.backgroundColor;
+    element.style.backgroundColor = "white"; // override oklch()
+
+    try {
+      const canvas = await html2canvas(element, { scale: 2, useCORS: true });
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF("p", "mm", "a4");
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+      pdf.save("application.pdf");
+    } finally {
+      element.style.backgroundColor = originalBg; // restore
+    }
+  };
 
   if (loading) {
     return (
@@ -290,7 +311,7 @@ const ApplicationDetails = ({ role }: { role: string }) => {
   }
 
   return (
-    <div className="space-y-6 max-w-6xl mx-auto">
+    <div id="application-details" className="space-y-6 max-w-6xl mx-auto">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -606,7 +627,7 @@ const ApplicationDetails = ({ role }: { role: string }) => {
             </Button>
 
             {role === "examController" && (
-              <Button variant="outline">
+              <Button variant="outline" onClick={handleDownloadPDF}>
                 <FileText className="w-4 h-4 mr-2" />
                 Download Details
               </Button>
