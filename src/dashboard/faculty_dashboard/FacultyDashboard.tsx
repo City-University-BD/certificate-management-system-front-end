@@ -1,4 +1,4 @@
-import { FileText, LogOut, Menu, User, X } from "lucide-react";
+import { FileText, LogOut, Menu, Upload, User, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router";
 
@@ -12,11 +12,17 @@ interface FacultyData {
   role: number;
   department: string;
   designation: string;
+  signature?: string;
 }
 
-const FacultyDashboard = () => {
+interface FacultyDashboardProps {
+  dashboard: string;
+}
+
+const FacultyDashboard = ({ dashboard }: FacultyDashboardProps) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [facultyInfo, setFacultyInfo] = useState<FacultyData | null>(null);
+  const [signaturePreview, setSignaturePreview] = useState<string | null>(null);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -26,14 +32,74 @@ const FacultyDashboard = () => {
     if (userData) {
       try {
         const parsedData = JSON.parse(userData);
-        if (parsedData.faculty) {
-          setFacultyInfo(parsedData.faculty);
+        if (parsedData.data) {
+          setFacultyInfo(parsedData.data);
+          // Load signature if exists
+          if (parsedData.data.signature) {
+            setSignaturePreview(parsedData.data.signature);
+          }
         }
       } catch (error) {
         console.error("Error parsing user data:", error);
       }
     }
   }, []);
+
+  const handleSignatureUpload = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith("image/")) {
+        alert("Please upload an image file");
+        return;
+      }
+
+      // Validate file size (max 2MB)
+      if (file.size > 2 * 1024 * 1024) {
+        alert("File size should be less than 2MB");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        setSignaturePreview(base64String);
+
+        // Update facultyInfo with signature
+        if (facultyInfo) {
+          const updatedInfo = { ...facultyInfo, signature: base64String };
+          setFacultyInfo(updatedInfo);
+
+          // Update localStorage
+          const userData = localStorage.getItem("userData");
+          if (userData) {
+            const parsedData = JSON.parse(userData);
+            parsedData.data.signature = base64String;
+            localStorage.setItem("userData", JSON.stringify(parsedData));
+          }
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeSignature = () => {
+    setSignaturePreview(null);
+    if (facultyInfo) {
+      const updatedInfo = { ...facultyInfo, signature: undefined };
+      setFacultyInfo(updatedInfo);
+
+      // Update localStorage
+      const userData = localStorage.getItem("userData");
+      if (userData) {
+        const parsedData = JSON.parse(userData);
+        delete parsedData.data.signature;
+        localStorage.setItem("userData", JSON.stringify(parsedData));
+      }
+    }
+  };
 
   const isActive = (path: string) => {
     if (path === "/faculty-dashboard") {
@@ -72,7 +138,7 @@ const FacultyDashboard = () => {
               <h1 className="text-xl font-bold text-gray-900">
                 Certificate Management System
               </h1>
-              <p className="text-sm text-gray-600">Faculty Dashboard</p>
+              <p className="text-sm text-gray-600">{dashboard}</p>
             </div>
           </div>
         </div>
@@ -109,17 +175,9 @@ const FacultyDashboard = () => {
               <div className="space-y-4">
                 {/* Profile Section */}
                 <div className="flex flex-col items-center text-center pb-3 border-b border-gray-100">
-                  {facultyInfo.image && facultyInfo.image !== "johndoe.jpg" ? (
-                    <img
-                      src={facultyInfo.image}
-                      alt={facultyInfo.name}
-                      className="w-16 h-16 rounded-full object-cover border-2 border-blue-200 mb-2"
-                    />
-                  ) : (
-                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center mb-2">
-                      <User className="w-8 h-8 text-white" />
-                    </div>
-                  )}
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center mb-2">
+                    <User className="w-8 h-8 text-white" />
+                  </div>
                   <p className="text-sm font-semibold text-gray-900">
                     {facultyInfo.name}
                   </p>
@@ -156,6 +214,61 @@ const FacultyDashboard = () => {
                     <p className="font-medium text-gray-900">
                       {facultyInfo.phone}
                     </p>
+                  </div>
+
+                  {/* Signature Section */}
+                  <div className="bg-gray-50 p-2 rounded-lg">
+                    <p className="text-gray-500 mb-2">Digital Signature</p>
+                    {signaturePreview ? (
+                      <div className="space-y-2">
+                        <div className="bg-white border-2 border-gray-200 rounded-lg p-2 flex items-center justify-center">
+                          <img
+                            src={signaturePreview}
+                            alt="Signature"
+                            className="max-h-20 max-w-full object-contain"
+                          />
+                        </div>
+                        <div className="flex gap-2">
+                          <label className="flex-1 cursor-pointer">
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={handleSignatureUpload}
+                              className="hidden"
+                            />
+                            <div className="flex items-center justify-center gap-1 px-2 py-1 bg-blue-50 text-blue-600 rounded hover:bg-blue-100 transition-colors text-xs font-medium">
+                              <Upload className="w-3 h-3" />
+                              Change
+                            </div>
+                          </label>
+                          <button
+                            onClick={removeSignature}
+                            className="flex-1 flex items-center justify-center gap-1 px-2 py-1 bg-red-50 text-red-600 rounded hover:bg-red-100 transition-colors text-xs font-medium"
+                          >
+                            <X className="w-3 h-3" />
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <label className="cursor-pointer">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleSignatureUpload}
+                          className="hidden"
+                        />
+                        <div className="flex flex-col items-center justify-center py-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-all">
+                          <Upload className="w-6 h-6 text-gray-400 mb-1" />
+                          <p className="text-xs text-gray-600 font-medium">
+                            Upload Signature
+                          </p>
+                          <p className="text-xs text-gray-400 mt-0.5">
+                            PNG, JPG (Max 2MB)
+                          </p>
+                        </div>
+                      </label>
+                    )}
                   </div>
                 </div>
               </div>

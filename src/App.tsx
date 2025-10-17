@@ -23,19 +23,34 @@ function App() {
           <Route path="status" element={<StatusCheck />} />
           <Route path="payment" element={<SSLPaymentPage />} />
         </Route>
-        <Route path="/faculty-dashboard" element={<FacultyDashboard />}>
-          <Route index element={<ApplicationsList role={"faculty"} />} />
-          <Route path="application/:id" element={<ApplicationDetails />} />
-        </Route>
-        <Route path="/accounts-dashboard" element={<FacultyDashboard />}>
-          <Route index element={<ApplicationsList role={"accounts"} />} />
-          <Route path="application/:id" element={<ApplicationDetails />} />
-        </Route>
-        <Route path="/exam-controller-dashboard" element={<FacultyDashboard />}>
+
+        <Route
+          path="/exam-controller-dashboard"
+          element={<FacultyDashboard dashboard={"Exam Controller Dashboard"} />}
+        >
           <Route index element={<ApplicationsList role={"examController"} />} />
           <Route path="application/:id" element={<ApplicationDetails />} />
         </Route>
-        <Route path="/library-dashboard" element={<FacultyDashboard />}>
+
+        <Route
+          path="/faculty-dashboard"
+          element={<FacultyDashboard dashboard={"Exam Controller Dashboard"} />}
+        >
+          <Route index element={<ApplicationsList role={"faculty"} />} />
+          <Route path="application/:id" element={<ApplicationDetails />} />
+        </Route>
+        <Route
+          path="/accounts-dashboard"
+          element={<FacultyDashboard dashboard={"Exam Controller Dashboard"} />}
+        >
+          <Route index element={<ApplicationsList role={"accounts"} />} />
+          <Route path="application/:id" element={<ApplicationDetails />} />
+        </Route>
+
+        <Route
+          path="/library-dashboard"
+          element={<FacultyDashboard dashboard={"Exam Controller Dashboard"} />}
+        >
           <Route index element={<ApplicationsList role={"library"} />} />
           <Route path="application/:id" element={<ApplicationDetails />} />
         </Route>
