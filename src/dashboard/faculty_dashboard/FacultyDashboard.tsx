@@ -1,6 +1,6 @@
 import { FileText, LogOut, Menu, Upload, User, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Outlet, useLocation, useNavigate } from "react-router";
+import { Link, Outlet, useLocation, useNavigate } from "react-router";
 
 interface FacultyData {
   _id: string;
@@ -17,9 +17,10 @@ interface FacultyData {
 
 interface FacultyDashboardProps {
   dashboard: string;
+  url: string;
 }
 
-const FacultyDashboard = ({ dashboard }: FacultyDashboardProps) => {
+const FacultyDashboard = ({ dashboard, url }: FacultyDashboardProps) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [facultyInfo, setFacultyInfo] = useState<FacultyData | null>(null);
   const [signaturePreview, setSignaturePreview] = useState<string | null>(null);
@@ -153,8 +154,9 @@ const FacultyDashboard = ({ dashboard }: FacultyDashboardProps) => {
         >
           {/* Navigation Menu */}
           <nav className="p-4 space-y-1">
-            <button
-              onClick={() => navigate("/faculty-dashboard")}
+            <Link
+              // onClick={() => navigate(`/${dashboard}`)}
+              to={`http://localhost:5173${url}`}
               className={`w-full flex items-center gap-3 px-4 py-3 hover:cursor-pointer rounded-lg transition-colors ${
                 isActive("/faculty-dashboard")
                   ? "bg-blue-50 text-blue-700"
@@ -163,7 +165,7 @@ const FacultyDashboard = ({ dashboard }: FacultyDashboardProps) => {
             >
               <FileText className="w-5 h-5" />
               <span className="font-medium">All Applications</span>
-            </button>
+            </Link>
           </nav>
 
           {/* Faculty Information - Grows to fill space */}

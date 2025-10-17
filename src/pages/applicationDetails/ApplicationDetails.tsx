@@ -129,7 +129,7 @@ const ApplicationDetails = ({ role }: { role: string }) => {
       const res = await fetch(
         `https://server-side-rho-snowy.vercel.app/application/clearance/${role}/${id}`,
         {
-          method: "PATCH",
+          method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ status: 1, message: "" }),
         }
@@ -137,7 +137,8 @@ const ApplicationDetails = ({ role }: { role: string }) => {
 
       const data = await res.json();
       if (res.ok) {
-        toast.success("Application approved successfully ✅");
+        console.log("hit in res ok");
+        toast("Application approved successfully ✅");
         setApplication((prev) =>
           prev
             ? {
@@ -169,9 +170,9 @@ const ApplicationDetails = ({ role }: { role: string }) => {
     try {
       setIsSubmitting(true);
       const res = await fetch(
-        `https://server-side-rho-snowy.vercel.app/application/clearance/faculty/${id}`,
+        `https://server-side-rho-snowy.vercel.app/application/clearance/${role}/${id}`,
         {
-          method: "PATCH",
+          method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ status: -1, message: rejectMessage }),
         }
@@ -228,6 +229,11 @@ const ApplicationDetails = ({ role }: { role: string }) => {
     const statusInfo =
       statusMap[status as keyof typeof statusMap] || statusMap[0];
     const Icon = statusInfo.icon;
+
+    if (status === -1) {
+      statusInfo.label = "Rejected";
+      statusInfo.color = "bg-red-100 text-red-800";
+    }
 
     return (
       <span

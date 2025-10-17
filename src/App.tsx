@@ -26,7 +26,12 @@ function App() {
 
         <Route
           path="/exam-controller-dashboard"
-          element={<FacultyDashboard dashboard={"Exam Controller Dashboard"} />}
+          element={
+            <FacultyDashboard
+              dashboard={"Exam Controller Dashboard"}
+              url={"/exam-controller-dashboard"}
+            />
+          }
         >
           <Route
             index
@@ -39,13 +44,18 @@ function App() {
           />
           <Route
             path="application/:id"
-            element={<ApplicationDetails role={"examController"} />}
+            element={<ApplicationDetails role={"exam"} />}
           />
         </Route>
 
         <Route
           path="/faculty-dashboard"
-          element={<FacultyDashboard dashboard={"Faculty Dashboard"} />}
+          element={
+            <FacultyDashboard
+              dashboard={"Faculty Dashboard"}
+              url={"/faculty-dashboard"}
+            />
+          }
         >
           <Route
             index
@@ -60,7 +70,12 @@ function App() {
         </Route>
         <Route
           path="/accounts-dashboard"
-          element={<FacultyDashboard dashboard={"Accounts Dashboard"} />}
+          element={
+            <FacultyDashboard
+              dashboard={"Accounts Dashboard"}
+              url={"/accounts-dashboard"}
+            />
+          }
         >
           <Route
             index
@@ -76,7 +91,12 @@ function App() {
 
         <Route
           path="/library-dashboard"
-          element={<FacultyDashboard dashboard={"Exam Controller Dashboard"} />}
+          element={
+            <FacultyDashboard
+              dashboard={"Library Dashboard"}
+              url={"/library-dashboard"}
+            />
+          }
         >
           <Route
             index

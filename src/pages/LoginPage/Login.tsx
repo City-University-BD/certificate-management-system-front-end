@@ -105,7 +105,7 @@ const Login: React.FC = () => {
 
     try {
       const submitData = {
-        email: loginData.email,
+        email: loginData.email.trim().toLowerCase(),
         password: loginData.password,
         // role: loginData.role,
       };
