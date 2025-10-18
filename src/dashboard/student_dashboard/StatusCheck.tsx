@@ -150,35 +150,75 @@ const StatusCheck = () => {
     }
   };
 
-  const getClearanceStatusIcon = (status?: number) => {
-    if (status === undefined)
-      return <Clock className="h-5 w-5 text-yellow-500" />;
+  // const getClearanceStatusIcon = (status?: number) => {
+  //   if (status === undefined)
+  //     return <Clock className="h-5 w-5 text-yellow-500" />;
 
-    switch (status) {
-      case 0:
-        return <Clock className="h-5 w-5 text-yellow-500" />;
-      case 1:
-        return <CheckCircle className="h-5 w-5 text-green-500" />;
-      case 2:
-        return <XCircle className="h-5 w-5 text-red-500" />;
-      default:
-        return <Clock className="h-5 w-5 text-gray-500" />;
+  //   switch (status) {
+  //     case 0:
+  //       return <Clock className="h-5 w-5 text-yellow-500" />;
+  //     case 1:
+  //       return <CheckCircle className="h-5 w-5 text-green-500" />;
+  //     case 2:
+  //       return <XCircle className="h-5 w-5 text-red-500" />;
+  //     default:
+  //       return <Clock className="h-5 w-5 text-gray-500" />;
+  //   }
+  // };
+
+  // const getClearanceStatusText = (status?: number) => {
+  //   if (status === undefined) return "Pending";
+
+  //   switch (status) {
+  //     case 0:
+  //       return "Pending";
+  //     case 1:
+  //       return "Approved";
+  //     case 2:
+  //       return "Rejected";
+  //     default:
+  //       return "Unknown";
+  //   }
+  // };
+
+  const clearanceSteps = [
+    { label: "Exam Controller", key: "examController" },
+    { label: "Faculty", key: "faculty" },
+    { label: "Accounts", key: "accounts" },
+    { label: "Library", key: "library" },
+    { label: "HOD", key: "hod" },
+    { label: "Administrator", key: "administrator" },
+  ];
+
+  const getCurrentClearanceStep = (clearance: Clearance) => {
+    const steps = [
+      "examController",
+      "faculty",
+      "accounts",
+      "library",
+      "hod",
+      "administrator",
+    ];
+
+    // Find the last approved step
+    let lastApproved = -1;
+    for (let i = 0; i < steps.length; i++) {
+      const stepKey = steps[i] as keyof Clearance;
+      if (clearance[stepKey].status === 1) {
+        lastApproved = i;
+      }
     }
-  };
 
-  const getClearanceStatusText = (status?: number) => {
-    if (status === undefined) return "Pending";
-
-    switch (status) {
-      case 0:
-        return "Pending";
-      case 1:
-        return "Approved";
-      case 2:
-        return "Rejected";
-      default:
-        return "Unknown";
+    // Check if any step is rejected
+    for (let i = 0; i < steps.length; i++) {
+      const stepKey = steps[i] as keyof Clearance;
+      if (clearance[stepKey].status === 2) {
+        return { currentStep: i, isRejected: true };
+      }
     }
+
+    // Return next pending step
+    return { currentStep: lastApproved + 1, isRejected: false };
   };
 
   if (isLoading) {
@@ -241,6 +281,10 @@ const StatusCheck = () => {
     );
   }
 
+  const { currentStep, isRejected } = getCurrentClearanceStep(
+    application.clearance
+  );
+
   return (
     <div className="space-y-6 p-6">
       {/* Page Header */}
@@ -258,6 +302,108 @@ const StatusCheck = () => {
           </p>
         </div>
       </div>
+
+      {/* Clearance Stepper */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Clearance Progress</CardTitle>
+          <CardDescription>
+            Track approvals from different departments
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {isRejected ? (
+            <div className="text-center py-8">
+              <XCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
+              <p className="text-xl font-semibold text-red-600">
+                Clearance Rejected
+              </p>
+              <p className="text-gray-600 mt-2">
+                One or more departments have rejected your clearance
+              </p>
+            </div>
+          ) : (
+            <div className="relative overflow-x-auto">
+              <div className="flex justify-between items-start min-w-max px-4">
+                {clearanceSteps.map((step, index) => {
+                  const stepKey = step.key as keyof Clearance;
+                  const stepStatus = application.clearance[stepKey].status;
+                  const isCompleted = stepStatus === 1;
+                  const isCurrent = index === currentStep && !isCompleted;
+                  // const isUpcoming = index > currentStep;
+
+                  return (
+                    <div
+                      key={index}
+                      className="flex flex-col items-center flex-1 relative min-w-[100px]"
+                    >
+                      {/* Line before step (except first) */}
+                      {index !== 0 && (
+                        <div
+                          className={`absolute top-5 right-1/2 w-full h-0.5 -z-10 ${
+                            isCompleted ||
+                            (index <= currentStep &&
+                              application.clearance[
+                                clearanceSteps[index - 1].key as keyof Clearance
+                              ].status === 1)
+                              ? "bg-green-500"
+                              : "bg-gray-300"
+                          }`}
+                          style={{ transform: "translateY(-50%)" }}
+                        />
+                      )}
+
+                      {/* Step Circle */}
+                      <div
+                        className={`w-10 h-10 rounded-full flex items-center justify-center border-2 mb-2 transition-all ${
+                          isCompleted
+                            ? "bg-green-500 border-green-500"
+                            : isCurrent
+                            ? "bg-blue-500 border-blue-500"
+                            : "bg-white border-gray-300"
+                        }`}
+                      >
+                        {isCompleted ? (
+                          <CheckCircle className="h-6 w-6 text-white" />
+                        ) : isCurrent ? (
+                          <Clock className="h-6 w-6 text-white" />
+                        ) : (
+                          <span className="text-gray-400 font-semibold text-xs">
+                            {index + 1}
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Step Label */}
+                      <p
+                        className={`text-xs font-medium text-center ${
+                          isCompleted || isCurrent
+                            ? "text-gray-900"
+                            : "text-gray-400"
+                        }`}
+                      >
+                        {step.label}
+                      </p>
+
+                      {/* Step Status */}
+                      {isCurrent && (
+                        <Badge className="mt-2 bg-blue-500 text-xs">
+                          Pending
+                        </Badge>
+                      )}
+                      {isCompleted && (
+                        <Badge className="mt-2 bg-green-500 text-xs">
+                          Approved
+                        </Badge>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Application Overview */}
       <Card>
@@ -351,157 +497,6 @@ const StatusCheck = () => {
                   ? `৳${application.paymentAmount.toLocaleString()}`
                   : "Not Set"}
               </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Clearance Status */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Clearance Status</CardTitle>
-          <CardDescription>
-            Track approvals from different departments
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {/* Faculty */}
-            <div className="flex items-center justify-between p-4 border rounded-lg">
-              <div className="flex items-center gap-3">
-                {getClearanceStatusIcon(application.clearance.faculty.status)}
-                <div>
-                  <p className="font-medium">Faculty</p>
-                  {application.clearance.faculty.message && (
-                    <p className="text-sm text-gray-500">
-                      {application.clearance.faculty.message}
-                    </p>
-                  )}
-                </div>
-              </div>
-              <Badge variant="outline">
-                {getClearanceStatusText(application.clearance.faculty.status)}
-              </Badge>
-            </div>
-
-            {/* Accounts */}
-            <div className="flex items-center justify-between p-4 border rounded-lg">
-              <div className="flex items-center gap-3">
-                {getClearanceStatusIcon(application.clearance.accounts.status)}
-                <div>
-                  <p className="font-medium">Accounts</p>
-                  {application.clearance.accounts.message && (
-                    <p className="text-sm text-gray-500">
-                      {application.clearance.accounts.message}
-                    </p>
-                  )}
-                </div>
-              </div>
-              <Badge variant="outline">
-                {getClearanceStatusText(application.clearance.accounts.status)}
-              </Badge>
-            </div>
-
-            {/* Library */}
-            <div className="flex items-center justify-between p-4 border rounded-lg">
-              <div className="flex items-center gap-3">
-                {getClearanceStatusIcon(application.clearance.library.status)}
-                <div>
-                  <p className="font-medium">Library</p>
-                  {application.clearance.library.message && (
-                    <p className="text-sm text-gray-500">
-                      {application.clearance.library.message}
-                    </p>
-                  )}
-                </div>
-              </div>
-              <Badge variant="outline">
-                {getClearanceStatusText(application.clearance.library.status)}
-              </Badge>
-            </div>
-
-            {/* Exam Controller */}
-            <div className="flex items-center justify-between p-4 border rounded-lg">
-              <div className="flex items-center gap-3">
-                {getClearanceStatusIcon(
-                  application.clearance.examController.status
-                )}
-                <div>
-                  <p className="font-medium">Exam Controller</p>
-                  {application.clearance.examController.message && (
-                    <p className="text-sm text-gray-500">
-                      {application.clearance.examController.message}
-                    </p>
-                  )}
-                </div>
-              </div>
-              <Badge variant="outline">
-                {getClearanceStatusText(
-                  application.clearance.examController.status
-                )}
-              </Badge>
-            </div>
-
-            {/* HOD */}
-            <div className="flex items-center justify-between p-4 border rounded-lg">
-              <div className="flex items-center gap-3">
-                {getClearanceStatusIcon(application.clearance.hod.status)}
-                <div>
-                  <p className="font-medium">Head of Department</p>
-                  {application.clearance.hod.message && (
-                    <p className="text-sm text-gray-500">
-                      {application.clearance.hod.message}
-                    </p>
-                  )}
-                </div>
-              </div>
-              <Badge variant="outline">
-                {getClearanceStatusText(application.clearance.hod.status)}
-              </Badge>
-            </div>
-
-            {/* Administrator */}
-            <div className="flex items-center justify-between p-4 border rounded-lg">
-              <div className="flex items-center gap-3">
-                {getClearanceStatusIcon(
-                  application.clearance.administrator.status
-                )}
-                <div>
-                  <p className="font-medium">Administrator</p>
-                  {application.clearance.administrator.message && (
-                    <p className="text-sm text-gray-500">
-                      {application.clearance.administrator.message}
-                    </p>
-                  )}
-                </div>
-              </div>
-              <Badge variant="outline">
-                {getClearanceStatusText(
-                  application.clearance.administrator.status
-                )}
-              </Badge>
-            </div>
-
-            {/* Controller */}
-            <div className="flex items-center justify-between p-4 border rounded-lg">
-              <div className="flex items-center gap-3">
-                {getClearanceStatusIcon(
-                  application.clearance.controller.status
-                )}
-                <div>
-                  <p className="font-medium">Controller</p>
-                  {application.clearance.controller.message && (
-                    <p className="text-sm text-gray-500">
-                      {application.clearance.controller.message}
-                    </p>
-                  )}
-                </div>
-              </div>
-              <Badge variant="outline">
-                {getClearanceStatusText(
-                  application.clearance.controller.status
-                )}
-              </Badge>
             </div>
           </div>
         </CardContent>
