@@ -77,7 +77,7 @@ const StatusCheck = () => {
         }
 
         const parsedData = JSON.parse(userData);
-        const studentId = parsedData.data?.studentId;
+        const studentId = parsedData.studentData?.studentId;
 
         if (!studentId) {
           setError("Student ID not found.");

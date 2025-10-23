@@ -25,8 +25,8 @@ const StudentDashboard = () => {
     if (userData) {
       try {
         const parsedData = JSON.parse(userData);
-        if (parsedData.data) {
-          setStudentData(parsedData.data);
+        if (parsedData.studentData) {
+          setStudentData(parsedData.studentData);
         }
       } catch (error) {
         console.error("Error parsing user data:", error);

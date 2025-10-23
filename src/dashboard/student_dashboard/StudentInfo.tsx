@@ -37,12 +37,12 @@ const StudentInfo = () => {
         const parsedData = JSON.parse(userData);
 
         // Check if student data exists
-        if (!parsedData.data) {
+        if (!parsedData.studentData) {
           throw new Error("Student information not found");
         }
 
         // Set the student data
-        setStudentData(parsedData.data);
+        setStudentData(parsedData.studentData);
         setError(null);
       } catch (err) {
         console.error("Error fetching student data:", err);

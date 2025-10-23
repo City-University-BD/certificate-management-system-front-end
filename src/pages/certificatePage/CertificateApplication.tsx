@@ -17,6 +17,8 @@ interface FormData {
   studentId: string;
   studentName: string;
   program: string;
+  department: string;
+  departmentId: string;
   batch: string;
   creditCompleted: string;
   creditWaived: string;
@@ -28,7 +30,7 @@ interface FormData {
   passingYear: string;
   sscCertificate: File | null;
   hscCertificate: File | null;
-  applicationType: string;
+  applicationType: number;
   remarks: string;
 }
 
@@ -36,6 +38,8 @@ interface FormErrors {
   studentId?: string;
   studentName?: string;
   program?: string;
+  department?: string;
+  departmentId?: string;
   batch?: string;
   creditCompleted?: string;
   creditWaived?: string;
@@ -67,6 +71,8 @@ const CertificateApplicationForm: React.FC = () => {
     studentId: "",
     studentName: "",
     program: "",
+    department: "",
+    departmentId: "",
     batch: "",
     creditCompleted: "",
     creditWaived: "",
@@ -78,7 +84,7 @@ const CertificateApplicationForm: React.FC = () => {
     passingYear: "",
     sscCertificate: null,
     hscCertificate: null,
-    applicationType: "0",
+    applicationType: 0,
     remarks: "",
   });
 
@@ -107,7 +113,7 @@ const CertificateApplicationForm: React.FC = () => {
         const parsedData = JSON.parse(userData);
 
         // Check if student data exists
-        if (!parsedData.data) {
+        if (!parsedData.studentData) {
           setErrors({
             general: "Student information not found",
           });
@@ -120,10 +126,12 @@ const CertificateApplicationForm: React.FC = () => {
         // Pre-fill the form with student data
         setFormData((prev) => ({
           ...prev,
-          studentId: parsedData.data.studentId || "",
-          studentName: parsedData.data.name || "",
-          email: parsedData.data.email || "",
-          program: parsedData.data.department || "",
+          studentId: parsedData.studentData.studentId || "",
+          studentName: parsedData.studentData.name || "",
+          email: parsedData.studentData.email || "",
+          program: parsedData.studentData.department || "",
+          department: parsedData.studentData.department || "",
+          departmentId: parsedData.studentData.departmentId || "",
         }));
       } catch (err) {
         console.error("Error fetching student data:", err);
@@ -166,6 +174,10 @@ const CertificateApplicationForm: React.FC = () => {
     if (!formData.studentName.trim())
       newErrors.studentName = "Student Name is required";
     if (!formData.program.trim()) newErrors.program = "Program is required";
+    if (!formData.department.trim())
+      newErrors.department = "Department is required";
+    if (!formData.departmentId.trim())
+      newErrors.departmentId = "Department ID is required";
     if (!formData.batch.trim()) newErrors.batch = "Batch is required";
     if (!formData.creditCompleted.trim())
       newErrors.creditCompleted = "Credit Completed is required";
@@ -234,6 +246,8 @@ const CertificateApplicationForm: React.FC = () => {
       submitData.append("studentId", formData.studentId);
       submitData.append("studentName", formData.studentName);
       submitData.append("program", formData.program);
+      submitData.append("department", formData.department);
+      submitData.append("departmentId", formData.departmentId);
       submitData.append("batch", formData.batch);
       submitData.append("creditCompleted", formData.creditCompleted);
       submitData.append("creditWaived", formData.creditWaived);
@@ -243,7 +257,7 @@ const CertificateApplicationForm: React.FC = () => {
       submitData.append("dateOfBirth", formData.dateOfBirth);
       submitData.append("lastSemester", formData.lastSemester);
       submitData.append("passingYear", formData.passingYear);
-      submitData.append("applicationType", formData.applicationType);
+      submitData.append("applicationType", String(formData.applicationType));
       submitData.append("remarks", formData.remarks);
 
       if (formData.sscCertificate) {
@@ -253,13 +267,16 @@ const CertificateApplicationForm: React.FC = () => {
         submitData.append("hscCertificate", formData.hscCertificate);
       }
 
-      console.log("Submitting application with data:", {
-        studentId: formData.studentId,
-        studentName: formData.studentName,
-        program: formData.program,
-        email: formData.email,
-      });
+      // console.log("Submitting application with data:", {
+      //   studentId: formData.studentId,
+      //   studentName: formData.studentName,
+      //   program: formData.program,
+      //   email: formData.email,
+      // });
 
+      // console.log("Submitting application...", submitData);
+
+      // return;
       const response = await fetch(
         "https://server-side-rho-snowy.vercel.app/application/apply",
         {
@@ -284,9 +301,9 @@ const CertificateApplicationForm: React.FC = () => {
           const userData = localStorage.getItem("userData");
           if (userData) {
             const parsedData = JSON.parse(userData);
-            if (parsedData.data) {
+            if (parsedData.studentData) {
               // Update the isApplied field to true
-              parsedData.data.isApplied = true;
+              parsedData.studentData.isApplied = true;
               // Save back to localStorage
               localStorage.setItem("userData", JSON.stringify(parsedData));
               console.log("Updated isApplied to true in localStorage");
@@ -309,7 +326,7 @@ const CertificateApplicationForm: React.FC = () => {
           passingYear: "",
           sscCertificate: null,
           hscCertificate: null,
-          applicationType: "0",
+          applicationType: 0,
           remarks: "",
         }));
 
