@@ -11,7 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface FormData {
   name: string;
@@ -21,6 +21,7 @@ interface FormData {
   password: string;
   confirmPassword: string;
   department: string;
+  departmentId: string;
   image: File | null;
 }
 
@@ -35,6 +36,12 @@ interface FormErrors {
   general?: string;
 }
 
+interface Department {
+  _id: string;
+  name: string;
+  code: string;
+}
+
 const Registration: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({
     name: "",
@@ -44,22 +51,57 @@ const Registration: React.FC = () => {
     password: "",
     confirmPassword: "",
     department: "",
+    departmentId: "",
     image: null,
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [successMessage, setSuccessMessage] = useState<string>("");
+  const [departments, setDepartments] = useState<Department[]>([]);
+  const [loadingDepartments, setLoadingDepartments] = useState<boolean>(true);
+
+  useEffect(() => {
+    fetchDepartments();
+  }, []);
+
+  const fetchDepartments = async () => {
+    try {
+      const response = await fetch(
+        "https://server-side-rho-snowy.vercel.app/department"
+      );
+      if (response.ok) {
+        const result = await response.json();
+        setDepartments(result.data || []);
+      } else {
+        console.error("Failed to fetch departments");
+      }
+    } catch (error) {
+      console.error("Error fetching departments:", error);
+    } finally {
+      setLoadingDepartments(false);
+    }
+  };
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const target = e.target as HTMLInputElement;
     const { name, value, files } = target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: files ? files[0] : value,
-    }));
+
+    if (name === "department") {
+      const selectedDept = departments.find((dept) => dept._id === value);
+      setFormData((prev) => ({
+        ...prev,
+        department: selectedDept?.name || "",
+        departmentId: value,
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: files ? files[0] : value,
+      }));
+    }
 
     if (errors[name as keyof FormErrors]) {
       setErrors((prev) => ({
@@ -122,8 +164,9 @@ const Registration: React.FC = () => {
         email: formData.email.trim().toLowerCase(),
         phone: formData.phone.trim(),
         studentId: formData.studentId.trim(),
-        password: formData.password,
         department: formData.department,
+        departmentId: formData.departmentId,
+        password: formData.password,
       };
 
       const response = await fetch(
@@ -157,6 +200,7 @@ const Registration: React.FC = () => {
           password: "",
           confirmPassword: "",
           department: "",
+          departmentId: "",
           image: null,
         });
 
@@ -234,7 +278,7 @@ const Registration: React.FC = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-8">
       {/* Loading Overlay */}
       {isLoading && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-8 flex flex-col items-center space-y-4">
             <Loader2 className="h-12 w-12 animate-spin text-blue-600" />
             <p className="text-lg font-medium text-gray-900">
@@ -360,34 +404,24 @@ const Registration: React.FC = () => {
               <select
                 id="department"
                 name="department"
-                value={formData.department}
+                value={formData.departmentId}
                 onChange={handleInputChange}
                 className={`flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 ${
                   errors.department ? "border-red-500" : ""
                 }`}
                 required
+                disabled={loadingDepartments}
               >
-                <option value="">Select your department</option>
-                <option value="Computer Science & Engineering">
-                  Computer Science & Engineering
+                <option value="">
+                  {loadingDepartments
+                    ? "Loading departments..."
+                    : "Select your department"}
                 </option>
-                <option value="Business Administration">
-                  Business Administration
-                </option>
-                <option value="Electrical & Electronic Engineering">
-                  Electrical & Electronic Engineering
-                </option>
-                <option value="Civil Engineering">Civil Engineering</option>
-                <option value="Mechanical Engineering">
-                  Mechanical Engineering
-                </option>
-                <option value="English">English</option>
-                <option value="Economics">Economics</option>
-                <option value="Mathematics">Mathematics</option>
-                <option value="Physics">Physics</option>
-                <option value="Chemistry">Chemistry</option>
-                <option value="Architecture">Architecture</option>
-                <option value="Law">Law</option>
+                {departments.map((dept) => (
+                  <option key={dept._id} value={dept._id}>
+                    {dept.name}
+                  </option>
+                ))}
               </select>
               {errors.department && (
                 <p className="text-sm text-red-500">{errors.department}</p>
