@@ -1,4 +1,7 @@
 import { Route, Routes } from "react-router";
+import ApprovedApplication from "./dashboard/exam_controller_dashboard/ApprovedApplication";
+import ExamControllerApplicationList from "./dashboard/exam_controller_dashboard/ExamControllerApplicationList";
+import ExamControllerDashboard from "./dashboard/exam_controller_dashboard/ExamControllerDashboard";
 import FacultyDashboard from "./dashboard/faculty_dashboard/FacultyDashboard";
 import StatusCheck from "./dashboard/student_dashboard/StatusCheck";
 import StudentDashboard from "./dashboard/student_dashboard/StudentDashboard";
@@ -26,21 +29,19 @@ function App() {
 
         <Route
           path="/exam-controller-dashboard"
-          element={
-            <FacultyDashboard
-              dashboard={"Exam Controller Dashboard"}
-              url={"/exam-controller-dashboard"}
-            />
-          }
+          element={<ExamControllerDashboard />}
         >
           <Route
             index
             element={
-              <ApplicationsList
-                role={"examController"}
+              <ExamControllerApplicationList
                 url={"/exam-controller-dashboard"}
               />
             }
+          />
+          <Route
+            path="approved-applications"
+            element={<ApprovedApplication />}
           />
           <Route
             path="application/:id"
