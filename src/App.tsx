@@ -45,7 +45,7 @@ function App() {
           />
           <Route
             path="application/:id"
-            element={<ApplicationDetails role={"exam"} />}
+            element={<ApplicationDetails role={"examController"} />}
           />
         </Route>
 

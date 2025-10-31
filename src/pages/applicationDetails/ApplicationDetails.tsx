@@ -8,8 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
+import html2pdf from "html2pdf.js";
 import {
   ArrowLeft,
   BookOpen,
@@ -72,6 +71,7 @@ const ApplicationDetails = ({ role }: { role: string }) => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [application, setApplication] = useState<ApplicationData | null>(null);
+  // const [isApproved, setApproved] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showRejectModal, setShowRejectModal] = useState(false);
@@ -137,23 +137,9 @@ const ApplicationDetails = ({ role }: { role: string }) => {
 
       const data = await res.json();
       if (res.ok) {
-        console.log("hit in res ok");
+        setApplication(data.data);
+        // setApproved(true);
         toast("Application approved successfully ✅");
-        setApplication((prev) =>
-          prev
-            ? {
-                ...prev,
-                clearance: {
-                  ...prev.clearance,
-                  faculty: {
-                    ...prev.clearance.faculty,
-                    status: 1,
-                    message: "",
-                  },
-                },
-              }
-            : prev
-        );
       } else {
         throw new Error(data.message || "Approval failed");
       }
@@ -244,23 +230,37 @@ const ApplicationDetails = ({ role }: { role: string }) => {
       </span>
     );
   };
+
   const handleDownloadPDF = async () => {
     const element = document.getElementById("application-details");
     if (!element) return;
 
-    const originalBg = element.style.backgroundColor;
-    element.style.backgroundColor = "white"; // override oklch()
+    // Hide buttons
+    const actionsCard = element
+      .querySelector(".flex.flex-wrap.gap-3")
+      ?.closest("div");
+    if (actionsCard) (actionsCard as HTMLElement).style.display = "none";
+
+    const opt = {
+      margin: 10,
+      filename: `application-${application?.studentId}.pdf`,
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: "#ffffff",
+      },
+      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+    };
 
     try {
-      const canvas = await html2canvas(element, { scale: 2, useCORS: true });
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF("p", "mm", "a4");
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-      pdf.save("application.pdf");
+      await html2pdf().set(opt).from(element).save();
+      toast.success("PDF downloaded successfully!");
+    } catch (error) {
+      console.error("PDF error:", error);
+      toast.error("Failed to generate PDF");
     } finally {
-      element.style.backgroundColor = originalBg; // restore
+      if (actionsCard) (actionsCard as HTMLElement).style.display = "";
     }
   };
 
