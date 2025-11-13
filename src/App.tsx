@@ -8,6 +8,7 @@ import StudentDashboard from "./dashboard/student_dashboard/StudentDashboard";
 import StudentInfo from "./dashboard/student_dashboard/StudentInfo";
 import ApplicationsList from "./pages/applicaitonList/ApplicationsList";
 import ApplicationDetails from "./pages/applicationDetails/ApplicationDetails";
+import DownloadDetails from "./pages/applicationDetails/DownloadDetails";
 import CertificateApplicationForm from "./pages/certificatePage/CertificateApplication";
 import Login from "./pages/LoginPage/Login";
 import SSLPaymentPage from "./pages/payment/SSLPaymentPage";
@@ -112,6 +113,7 @@ function App() {
         </Route>
 
         <Route path="/certificate" element={<CertificateApplicationForm />} />
+        <Route path="/download-details/:id" element={<DownloadDetails />} />
       </Routes>
     </div>
   );

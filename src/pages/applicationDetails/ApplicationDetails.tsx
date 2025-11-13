@@ -8,7 +8,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import html2pdf from "html2pdf.js";
 import {
   ArrowLeft,
   BookOpen,
@@ -23,7 +22,7 @@ import {
   XCircle,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router";
+import { Link, useNavigate, useParams } from "react-router";
 import { toast } from "sonner";
 
 interface ClearanceItem {
@@ -95,7 +94,6 @@ const ApplicationDetails = ({ role }: { role: string }) => {
         }
 
         const result = await response.json();
-
         if (result.status === 200 && result.data) {
           setApplication(result.data);
         } else {
@@ -229,39 +227,6 @@ const ApplicationDetails = ({ role }: { role: string }) => {
         {statusInfo.label}
       </span>
     );
-  };
-
-  const handleDownloadPDF = async () => {
-    const element = document.getElementById("application-details");
-    if (!element) return;
-
-    // Hide buttons
-    const actionsCard = element
-      .querySelector(".flex.flex-wrap.gap-3")
-      ?.closest("div");
-    if (actionsCard) (actionsCard as HTMLElement).style.display = "none";
-
-    const opt = {
-      margin: 10,
-      filename: `application-${application?.studentId}.pdf`,
-      image: { type: "jpeg", quality: 0.98 },
-      html2canvas: {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: "#ffffff",
-      },
-      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-    };
-
-    try {
-      await html2pdf().set(opt).from(element).save();
-      toast.success("PDF downloaded successfully!");
-    } catch (error) {
-      console.error("PDF error:", error);
-      toast.error("Failed to generate PDF");
-    } finally {
-      if (actionsCard) (actionsCard as HTMLElement).style.display = "";
-    }
   };
 
   if (loading) {
@@ -633,10 +598,13 @@ const ApplicationDetails = ({ role }: { role: string }) => {
             </Button>
 
             {role === "examController" && (
-              <Button variant="outline" onClick={handleDownloadPDF}>
+              <Link
+                className="flex items-center hover:underline hover:cursor-pointer"
+                to={`/download-details/${application._id}`}
+              >
                 <FileText className="w-4 h-4 mr-2" />
                 Download Details
-              </Button>
+              </Link>
             )}
 
             <Button
