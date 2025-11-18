@@ -28,6 +28,7 @@ const ExamControllerDashboard = () => {
     if (userData) {
       try {
         const parsedData = JSON.parse(userData);
+        console.log(parsedData);
         if (parsedData.data) {
           setFacultyInfo(parsedData.data);
           // Load signature if exists
@@ -150,7 +151,7 @@ const ExamControllerDashboard = () => {
           {/* Navigation Menu */}
           <nav className="p-1 space-y-1">
             <Link
-              to={`http://localhost:5173/exam-controller-dashboard`}
+              to={`https://certificate-management-system-iota.vercel.app/exam-controller-dashboard`}
               className={`w-full flex items-center gap-3 px-4 py-3 hover:cursor-pointer rounded-lg transition-colors ${
                 isActive("/faculty-dashboard")
                   ? "bg-blue-50 text-blue-700"
@@ -163,7 +164,7 @@ const ExamControllerDashboard = () => {
           </nav>
           <nav className="p-1 space-y-1">
             <Link
-              to={`http://localhost:5173/exam-controller-dashboard/approved-applications`}
+              to={`https://certificate-management-system-iota.vercel.app/exam-controller-dashboard/approved-applications`}
               className={`w-full flex items-center gap-3 px-4 py-3 hover:cursor-pointer rounded-lg transition-colors ${
                 isActive("/faculty-dashboard")
                   ? "bg-blue-50 text-blue-700"

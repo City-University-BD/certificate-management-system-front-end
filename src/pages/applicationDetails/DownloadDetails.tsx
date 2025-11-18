@@ -99,7 +99,7 @@ const DownloadDetails = () => {
         @media print {
           body {
             margin: 0;
-            padding: 20px;
+            padding: 0px;
           }
           .no-print {
             display: none !important;
@@ -107,7 +107,7 @@ const DownloadDetails = () => {
           .print-container {
             max-width: 100% !important;
             margin: 0 !important;
-            padding: 30px !important;
+            padding: 0px !important;
           }
         }
         

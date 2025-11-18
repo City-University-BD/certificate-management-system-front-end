@@ -9,20 +9,30 @@ interface Student {
   phone: string;
   studentId: string;
   department: string;
-  image?: string;
+  image?: string | File | null;
+  signature?: string | File | null;
   isApplied?: boolean;
+}
+
+interface Department {
+  _id: string;
+  name: string;
+  code: string;
 }
 
 const StudentInfo = () => {
   const [studentData, setStudentData] = useState<Student | null>(null);
+  const [studentId, setStudentId] = useState<string>("");
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [departments, setDepartments] = useState<Department[]>([]);
+  const [loadingDepartments, setLoadingDepartments] = useState<boolean>(true);
 
-  // Fetch student data from localStorage
+  // Fetch student id from localStorage
   useEffect(() => {
-    const fetchStudentData = () => {
+    const fetchStudentId = () => {
       try {
         setIsLoading(true);
 
@@ -41,8 +51,9 @@ const StudentInfo = () => {
           throw new Error("Student information not found");
         }
 
-        // Set the student data
-        setStudentData(parsedData.studentData);
+        // Set the student id
+        console.log(parsedData.studentData._id);
+        setStudentId(parsedData.studentData._id);
         setError(null);
       } catch (err) {
         console.error("Error fetching student data:", err);
@@ -56,8 +67,69 @@ const StudentInfo = () => {
       }
     };
 
-    fetchStudentData();
+    fetchStudentId();
   }, []);
+
+  useEffect(() => {
+    const fetchStudentData = async () => {
+      try {
+        setIsLoading(true);
+        const response = await fetch(
+          `https://server-side-rho-snowy.vercel.app/student/profile/${studentId}`
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch student profile");
+        }
+
+        const data = await response.json();
+        console.log(data);
+        if (!data) {
+          throw new Error("Student data not found");
+        }
+        console.log(data);
+        // 🔥 Set student data
+        setStudentData(data.data);
+
+        setError(null);
+      } catch (err) {
+        console.error("Error fetching student:", err);
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Unable to load student information."
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchStudentData();
+  }, [studentId]);
+
+  useEffect(() => {
+    fetchDepartments();
+  }, []);
+
+  const fetchDepartments = async () => {
+    try {
+      const response = await fetch(
+        "https://server-side-rho-snowy.vercel.app/department"
+      );
+      if (response.ok) {
+        const result = await response.json();
+        setDepartments(result.data || []);
+      } else {
+        console.error("Failed to fetch departments");
+      }
+    } catch (error) {
+      console.error("Error fetching departments:", error);
+    } finally {
+      setLoadingDepartments(false);
+    }
+  };
+
+  console.log(studentData);
 
   // Save updated student data
   const handleSave = async () => {
@@ -66,59 +138,54 @@ const StudentInfo = () => {
     try {
       setIsSaving(true);
 
-      // Get token from localStorage
+      // Get token
       const authToken = localStorage.getItem("authToken");
-      const userData = localStorage.getItem("userData");
+      if (!authToken) throw new Error("No authentication token found");
 
-      if (!authToken) {
-        throw new Error("No authentication token found");
+      // 🔥 Prepare FormData for uploading files
+      const formData = new FormData();
+      formData.append("name", studentData.name);
+      formData.append("email", studentData.email);
+      formData.append("phone", studentData.phone);
+      formData.append("studentId", studentData.studentId);
+      formData.append("department", studentData.department);
+
+      // Only append files if they exist
+      if (studentData.image instanceof File) {
+        formData.append("image", studentData.image);
       }
 
-      if (!userData) {
-        throw new Error("No user data found");
+      if (studentData.signature instanceof File) {
+        formData.append("signature", studentData.signature);
       }
 
+      // API call
       const response = await fetch(
-        "https://server-side-rho-snowy.vercel.app/student/profile",
+        `https://server-side-rho-snowy.vercel.app/student/profile/${studentId}`,
         {
           method: "PUT",
           headers: {
-            "Content-Type": "application/json",
             Authorization: `Bearer ${authToken}`,
+            // ❌ DO NOT SET Content-Type when using FormData
           },
-          body: JSON.stringify({
-            name: studentData.name,
-            email: studentData.email,
-            phone: studentData.phone,
-            department: studentData.department,
-          }),
+          body: formData,
         }
       );
 
       if (!response.ok) {
-        if (response.status === 401) {
-          throw new Error("Authentication failed. Please login again.");
-        }
         throw new Error("Failed to update profile");
       }
 
       const result = await response.json();
 
-      // Update localStorage with new data
-      const parsedUserData = JSON.parse(userData);
-      parsedUserData.data = { ...studentData, ...result.data };
-      localStorage.setItem("userData", JSON.stringify(parsedUserData));
-
-      setStudentData(parsedUserData.data);
+      // Update your state
+      setStudentData(result.data);
       setIsEditing(false);
+
       alert("Profile updated successfully!");
     } catch (err) {
       console.error("Error updating profile:", err);
-      alert(
-        err instanceof Error
-          ? err.message
-          : "Failed to update profile. Please try again."
-      );
+      alert(err.message || "Failed to update profile");
     } finally {
       setIsSaving(false);
     }
@@ -363,23 +430,83 @@ const StudentInfo = () => {
                   }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
-                  <option value="Computer Science">Computer Science</option>
-                  <option value="Electrical Engineering">
-                    Electrical Engineering
-                  </option>
-                  <option value="Mechanical Engineering">
-                    Mechanical Engineering
-                  </option>
-                  <option value="Civil Engineering">Civil Engineering</option>
-                  <option value="Business Administration">
-                    Business Administration
-                  </option>
-                  <option value="Mathematics">Mathematics</option>
+                  {departments.map((dept) => (
+                    <option key={dept._id} value={dept._id}>
+                      {dept.name}
+                    </option>
+                  ))}
                 </select>
               ) : (
                 <p className="text-gray-900 font-medium bg-gray-50 px-3 py-2 rounded-lg">
                   {studentData.department}
                 </p>
+              )}
+            </div>
+            {/* Profile Image Field */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-600 flex items-center gap-2">
+                Profile Image
+              </label>
+
+              {isEditing ? (
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) =>
+                    setStudentData({
+                      ...studentData,
+                      image: e.target.files[0],
+                    })
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              ) : (
+                <div className="flex items-center gap-3">
+                  {/* {studentData.imageUrl ? (
+                    <img
+                      src={studentData.imageUrl}
+                      alt="Profile"
+                      className="w-20 h-20 rounded-lg object-cover border"
+                    />
+                  ) : (
+                    <p className="text-gray-500 text-sm">No image uploaded</p>
+                  )} */}
+                </div>
+              )}
+            </div>
+
+            {/* Signature Field */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-600 flex items-center gap-2">
+                Signature
+              </label>
+
+              {isEditing ? (
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) =>
+                    setStudentData({
+                      ...studentData,
+                      signature: e.target.files[0], // store the selected signature file
+                    })
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              ) : (
+                <div className="flex items-center gap-3">
+                  {studentData.signature ? (
+                    <img
+                      src={studentData.signature}
+                      alt="Signature"
+                      className="h-16 object-contain border p-2 rounded-lg bg-white"
+                    />
+                  ) : (
+                    <p className="text-gray-500 text-sm">
+                      No signature uploaded
+                    </p>
+                  )}
+                </div>
               )}
             </div>
           </div>
@@ -416,7 +543,7 @@ const StudentInfo = () => {
       {/* Quick Actions Card */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">
-          Quick Actions
+          Quick Actions (Upcoming)
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <button className="px-4 py-3 bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 transition-colors font-medium text-sm flex items-center justify-center gap-2">
