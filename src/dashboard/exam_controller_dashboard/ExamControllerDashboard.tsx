@@ -2,22 +2,21 @@ import { FileText, LogOut, Menu, Upload, User, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router";
 
-interface FacultyData {
+interface ExamControllerData {
   _id: string;
   name: string;
   email: string;
-  facultyId: string;
+  examId: string;
   phone: string;
   image: string;
   role: number;
-  department: string;
-  designation: string;
   signature?: string;
 }
 
 const ExamControllerDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [facultyInfo, setFacultyInfo] = useState<FacultyData | null>(null);
+  const [examControllerInfo, setExamController] =
+    useState<ExamControllerData | null>(null);
   const [signaturePreview, setSignaturePreview] = useState<string | null>(null);
   const navigate = useNavigate();
   const location = useLocation();
@@ -28,9 +27,8 @@ const ExamControllerDashboard = () => {
     if (userData) {
       try {
         const parsedData = JSON.parse(userData);
-        console.log(parsedData);
         if (parsedData.data) {
-          setFacultyInfo(parsedData.data);
+          setExamController(parsedData.data);
           // Load signature if exists
           if (parsedData.data.signature) {
             setSignaturePreview(parsedData.data.signature);
@@ -41,7 +39,6 @@ const ExamControllerDashboard = () => {
       }
     }
   }, []);
-
   const handleSignatureUpload = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -65,9 +62,12 @@ const ExamControllerDashboard = () => {
         setSignaturePreview(base64String);
 
         // Update facultyInfo with signature
-        if (facultyInfo) {
-          const updatedInfo = { ...facultyInfo, signature: base64String };
-          setFacultyInfo(updatedInfo);
+        if (examControllerInfo) {
+          const updatedInfo = {
+            ...examControllerInfo,
+            signature: base64String,
+          };
+          setExamController(updatedInfo);
 
           // Update localStorage
           const userData = localStorage.getItem("userData");
@@ -84,9 +84,9 @@ const ExamControllerDashboard = () => {
 
   const removeSignature = () => {
     setSignaturePreview(null);
-    if (facultyInfo) {
-      const updatedInfo = { ...facultyInfo, signature: undefined };
-      setFacultyInfo(updatedInfo);
+    if (examControllerInfo) {
+      const updatedInfo = { ...examControllerInfo, signature: undefined };
+      setExamController(updatedInfo);
 
       // Update localStorage
       const userData = localStorage.getItem("userData");
@@ -181,48 +181,50 @@ const ExamControllerDashboard = () => {
             <p className="font-semibold text-center text-gray-900 mb-3">
               My Information
             </p>
-            {facultyInfo ? (
+            {examControllerInfo ? (
               <div className="space-y-4">
                 {/* Profile Section */}
                 <div className="flex flex-col items-center text-center pb-3 border-b border-gray-100">
                   <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center mb-2">
-                    <User className="w-8 h-8 text-white" />
+                    {/* <User className="w-8 h-8 text-white" /> */}
+                    <img
+                      src={examControllerInfo.image}
+                      alt=""
+                      className="w-8 h-8"
+                    />
                   </div>
                   <p className="text-sm font-semibold text-gray-900">
-                    {facultyInfo.name}
-                  </p>
-                  <p className="text-xs text-gray-500 capitalize">
-                    {facultyInfo.designation}
+                    {examControllerInfo.name}
                   </p>
                 </div>
 
                 {/* Details Section */}
                 <div className="space-y-3 text-xs">
                   <div className="bg-gray-50 p-2 rounded-lg">
-                    <p className="text-gray-500 mb-1">Faculty ID</p>
+                    <p className="text-gray-500 mb-1">ExamController ID</p>
                     <p className="font-semibold text-gray-900">
-                      {facultyInfo.facultyId}
+                      {examControllerInfo.examId}
                     </p>
                   </div>
-
+                  {/* 
                   <div className="bg-gray-50 p-2 rounded-lg">
                     <p className="text-gray-500 mb-1">Department</p>
                     <p className="font-semibold text-gray-900 uppercase">
-                      {facultyInfo.department}
+                      {examControllerInfo.department}
                     </p>
-                  </div>
+                  </div> */}
 
                   <div className="bg-gray-50 p-2 rounded-lg">
                     <p className="text-gray-500 mb-1">Email</p>
                     <p className="font-medium text-gray-900 break-all">
-                      {facultyInfo.email}
+                      {examControllerInfo.email}
                     </p>
                   </div>
 
                   <div className="bg-gray-50 p-2 rounded-lg">
                     <p className="text-gray-500 mb-1">Phone</p>
                     <p className="font-medium text-gray-900">
-                      {facultyInfo.phone}
+                      {examControllerInfo.phone}
                     </p>
                   </div>
 

@@ -52,7 +52,6 @@ const StudentInfo = () => {
         }
 
         // Set the student id
-        console.log(parsedData.studentData._id);
         setStudentId(parsedData.studentData._id);
         setError(null);
       } catch (err) {
@@ -83,12 +82,10 @@ const StudentInfo = () => {
         }
 
         const data = await response.json();
-        console.log(data);
         if (!data) {
           throw new Error("Student data not found");
         }
-        console.log(data);
-        // 🔥 Set student data
+        //Set student data
         setStudentData(data.data);
 
         setError(null);
@@ -129,8 +126,6 @@ const StudentInfo = () => {
     }
   };
 
-  console.log(studentData);
-
   // Save updated student data
   const handleSave = async () => {
     if (!studentData) return;
@@ -142,7 +137,7 @@ const StudentInfo = () => {
       const authToken = localStorage.getItem("authToken");
       if (!authToken) throw new Error("No authentication token found");
 
-      // 🔥 Prepare FormData for uploading files
+      // Prepare FormData for uploading files
       const formData = new FormData();
       formData.append("name", studentData.name);
       formData.append("email", studentData.email);
@@ -166,7 +161,6 @@ const StudentInfo = () => {
           method: "PUT",
           headers: {
             Authorization: `Bearer ${authToken}`,
-            // ❌ DO NOT SET Content-Type when using FormData
           },
           body: formData,
         }
@@ -462,15 +456,15 @@ const StudentInfo = () => {
                 />
               ) : (
                 <div className="flex items-center gap-3">
-                  {/* {studentData.imageUrl ? (
+                  {studentData.image ? (
                     <img
-                      src={studentData.imageUrl}
+                      src={studentData.image}
                       alt="Profile"
                       className="w-20 h-20 rounded-lg object-cover border"
                     />
                   ) : (
                     <p className="text-gray-500 text-sm">No image uploaded</p>
-                  )} */}
+                  )}
                 </div>
               )}
             </div>

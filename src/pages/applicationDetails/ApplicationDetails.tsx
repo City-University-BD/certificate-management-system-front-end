@@ -8,22 +8,25 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+
 import {
   ArrowLeft,
   BookOpen,
   Calendar,
   CheckCircle,
   Clock,
+  Download,
   FileText,
   Loader2,
   Mail,
   Phone,
+  Trash,
   User,
   XCircle,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import toast, { Toaster } from "react-hot-toast";
 import { Link, useNavigate, useParams } from "react-router";
-import { toast } from "sonner";
 
 interface ClearanceItem {
   status: number;
@@ -47,8 +50,8 @@ interface ApplicationData {
   passingYear: number;
   applicationType: number;
   applicationStatus: number;
-  sscCertificate: string | null;
-  hscCertificate: string | null;
+  sscCertificate: string | "";
+  hscCertificate: string | "";
   paymentStatus: number;
   paymentAmount: number;
   remarks: string;
@@ -74,6 +77,7 @@ const ApplicationDetails = ({ role }: { role: string }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showRejectModal, setShowRejectModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [rejectMessage, setRejectMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -146,6 +150,32 @@ const ApplicationDetails = ({ role }: { role: string }) => {
       console.log("data:", err);
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!id) return;
+
+    try {
+      const res = await fetch(
+        `https://server-side-rho-snowy.vercel.app/application/delete/${id}`,
+        {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: 1 }),
+        }
+      );
+
+      const data = await res.json();
+      if (res.ok) {
+        toast("Application Delete successfully ✅");
+        navigate(-1);
+      } else {
+        throw new Error(data.message || "Approval failed");
+      }
+    } catch (err) {
+      toast.error("Something went wrong");
+      console.log("data:", err);
     }
   };
 
@@ -284,6 +314,9 @@ const ApplicationDetails = ({ role }: { role: string }) => {
   return (
     <div id="application-details" className="space-y-6 max-w-6xl mx-auto">
       {/* Header */}
+      <div>
+        <Toaster />
+      </div>
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center gap-3">
@@ -544,28 +577,32 @@ const ApplicationDetails = ({ role }: { role: string }) => {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {application.sscCertificate && (
-                <div className="p-4 bg-gray-50 rounded-lg">
-                  <p className="font-medium text-gray-900 mb-2">
-                    SSC Certificate
-                  </p>
-                  <Button variant="outline" size="sm">
-                    <FileText className="w-4 h-4 mr-2" />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="border rounded-lg p-4">
+                  <p className="font-medium mb-2">SSC Certificate</p>
+                  <Link
+                    to={application.sscCertificate}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-blue-600 hover:text-blue-800"
+                  >
+                    <Download className="h-4 w-4" />
                     View Certificate
-                  </Button>
+                  </Link>
                 </div>
-              )}
-              {application.hscCertificate && (
-                <div className="p-4 bg-gray-50 rounded-lg">
-                  <p className="font-medium text-gray-900 mb-2">
-                    HSC Certificate
-                  </p>
-                  <Button variant="outline" size="sm">
-                    <FileText className="w-4 h-4 mr-2" />
+                <div className="border rounded-lg p-4">
+                  <p className="font-medium mb-2">HSC Certificate</p>
+                  <Link
+                    to={application.hscCertificate}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-blue-600 hover:text-blue-800"
+                  >
+                    <Download className="h-4 w-4" />
                     View Certificate
-                  </Button>
+                  </Link>
                 </div>
-              )}
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -595,6 +632,15 @@ const ApplicationDetails = ({ role }: { role: string }) => {
             >
               <XCircle className="w-4 h-4 mr-2" />
               Reject Application
+            </Button>
+
+            <Button
+              onClick={() => setShowDeleteModal(true)}
+              variant="destructive"
+              disabled={isSubmitting}
+            >
+              <Trash className="w-4 h-4 mr-2" />
+              Delete Application
             </Button>
 
             {role === "examController" && (
@@ -645,6 +691,25 @@ const ApplicationDetails = ({ role }: { role: string }) => {
                 <XCircle className="w-4 h-4 mr-2" />
               )}
               Reject
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* delete modal */}
+      <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Application</DialogTitle>
+          </DialogHeader>
+
+          <DialogFooter className="mt-4">
+            <Button variant="outline" onClick={() => setShowDeleteModal(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleDelete}>
+              <Trash className="w-4 h-4 mr-2" />
+              Delete
             </Button>
           </DialogFooter>
         </DialogContent>
