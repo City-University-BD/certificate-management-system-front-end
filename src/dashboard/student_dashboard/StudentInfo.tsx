@@ -179,7 +179,7 @@ const StudentInfo = () => {
       alert("Profile updated successfully!");
     } catch (err) {
       console.error("Error updating profile:", err);
-      alert(err.message || "Failed to update profile");
+      // alert(err.message || "Failed to update profile");
     } finally {
       setIsSaving(false);
     }
@@ -196,6 +196,15 @@ const StudentInfo = () => {
         setStudentData(parsedData.data);
       }
     }
+  };
+
+  const getImageSrc = (img: string | File | undefined) => {
+    if (!img) return undefined;
+
+    if (typeof img === "string") return img;
+
+    // File → object URL
+    return URL.createObjectURL(img);
   };
 
   // Loading state
@@ -266,7 +275,7 @@ const StudentInfo = () => {
           <div className="relative">
             {studentData.image && studentData.image !== "abc.jpg" ? (
               <img
-                src={studentData.image}
+                src={getImageSrc(studentData.image)}
                 alt={studentData.name}
                 className="w-24 h-24 rounded-full border-4 border-blue-100 shadow-sm object-cover"
               />
@@ -424,11 +433,15 @@ const StudentInfo = () => {
                   }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
-                  {departments.map((dept) => (
-                    <option key={dept._id} value={dept._id}>
-                      {dept.name}
-                    </option>
-                  ))}
+                  {loadingDepartments ? (
+                    <option>Loading departments...</option>
+                  ) : (
+                    departments.map((dept) => (
+                      <option key={dept._id} value={dept._id}>
+                        {dept.name}
+                      </option>
+                    ))
+                  )}
                 </select>
               ) : (
                 <p className="text-gray-900 font-medium bg-gray-50 px-3 py-2 rounded-lg">
@@ -446,19 +459,22 @@ const StudentInfo = () => {
                 <input
                   type="file"
                   accept="image/*"
-                  onChange={(e) =>
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return; // safe check
+
                     setStudentData({
                       ...studentData,
-                      image: e.target.files[0],
-                    })
-                  }
+                      image: file,
+                    });
+                  }}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               ) : (
                 <div className="flex items-center gap-3">
                   {studentData.image ? (
                     <img
-                      src={studentData.image}
+                      src={getImageSrc(studentData.image)}
                       alt="Profile"
                       className="w-20 h-20 rounded-lg object-cover border"
                     />
@@ -479,19 +495,22 @@ const StudentInfo = () => {
                 <input
                   type="file"
                   accept="image/*"
-                  onChange={(e) =>
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+
                     setStudentData({
                       ...studentData,
-                      signature: e.target.files[0], // store the selected signature file
-                    })
-                  }
+                      signature: file,
+                    });
+                  }}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               ) : (
                 <div className="flex items-center gap-3">
                   {studentData.signature ? (
                     <img
-                      src={studentData.signature}
+                      src={getImageSrc(studentData.signature)}
                       alt="Signature"
                       className="h-16 object-contain border p-2 rounded-lg bg-white"
                     />
