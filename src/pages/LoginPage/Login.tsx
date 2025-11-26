@@ -123,16 +123,16 @@ const Login: React.FC = () => {
       );
 
       const result = await response.json();
+     
 
       if (response.ok) {
         setSuccessMessage("Login successful! Redirecting...");
 
         // Store authentication data if provided
         if (result) {
-          localStorage.setItem("authToken", result.data.token);
+          localStorage.setItem("authToken", result.data.token)
         }
         if (result) {
-          console.log(result.data);
           localStorage.setItem("userData", JSON.stringify(result.data));
         }
 

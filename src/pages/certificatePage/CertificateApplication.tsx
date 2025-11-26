@@ -165,14 +165,14 @@ const CertificateApplicationForm: React.FC = () => {
         const parsedData = JSON.parse(userData);
 
         // Check if student data exists
-        if (!parsedData.studentData?.studentId) {
+        if (!parsedData?.studentId) {
           setErrors({
             general: "Student ID not found",
           });
           return;
         }
 
-        const studentId = parsedData.studentData.studentId;
+        const studentId = parsedData?.studentId;
 
         // Fetch application data from API
         const response = await fetch(

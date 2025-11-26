@@ -31,62 +31,78 @@ const StudentInfo = () => {
   const [loadingDepartments, setLoadingDepartments] = useState<boolean>(true);
 
   // Fetch student id from localStorage
-  useEffect(() => {
-    const fetchStudentId = () => {
-      try {
-        setIsLoading(true);
+useEffect(() => {
+  const fetchStudentId = () => {
+    try {
+      setIsLoading(true);
 
-        // Get userData from localStorage
-        const userData = localStorage.getItem("userData");
+      const userData = localStorage.getItem("userData");
+      if (!userData) throw new Error("No user data found. Please login again.");
 
-        if (!userData) {
-          throw new Error("No user data found. Please login again.");
-        }
+      const parsedData = JSON.parse(userData);
+      console.log(parsedData.studentData);
+      
+      // Use the correct path for _id
+      const id = parsedData?.studentData._id;
+      if (!id) throw new Error("Student information not found");
 
-        // Parse the JSON data
-        const parsedData = JSON.parse(userData);
+      setStudentId(id);
+      setError(null);
+    } catch (err) {
+      console.error("Error fetching student data:", err);
+      setError((err as Error).message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-        // Check if student data exists
-        if (!parsedData.studentData) {
-          throw new Error("Student information not found");
-        }
+  fetchStudentId();
+}, []);
 
-        // Set the student id
-        setStudentId(parsedData.studentData._id);
-        setError(null);
-      } catch (err) {
-        console.error("Error fetching student data:", err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchStudentId();
-  }, []);
 
   useEffect(() => {
-    const fetchStudentData = async () => {
-      try {
-        setIsLoading(true);
-        const response = await fetch(
-          `https://server-side-rho-snowy.vercel.app/student/profile/${studentId}`
-        );
+  const fetchStudentData = async () => {
+    if (!studentId) return; // Don't fetch if studentId is not set
 
-        const data = await response.json();
+    setIsLoading(true);
+    try {
+      const response = await fetch(
+        `https://server-side-rho-snowy.vercel.app/student/profile/${studentId}`
+      );
 
-        //Set student data
-        setStudentData(data.data);
-        localStorage.setItem("userData", JSON.stringify(data.data));
-        setError(null);
-      } catch (err) {
-        console.error("Error fetching student:", err);
-      } finally {
-        setIsLoading(false);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch student data: ${response.statusText}`);
       }
-    };
 
-    fetchStudentData();
-  }, [studentId]);
+      const result = await response.json();
+
+      if (!result.data) {
+        throw new Error("No student data returned from server");
+      }
+
+      // Update state
+      setStudentData(result.data);
+
+      // Update localStorage (keep the structure consistent if needed)
+      const existingUserData = localStorage.getItem("userData");
+      const parsedUserData = existingUserData ? JSON.parse(existingUserData) : {};
+      localStorage.setItem(
+        "userData",
+        JSON.stringify({ ...parsedUserData, ...result.data })
+      );
+
+      setError(null);
+    } catch (err) {
+      console.error("Error fetching student:", err);
+      setError((err as Error).message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  fetchStudentData();
+}, [studentId]);
+
 
   useEffect(() => {
     fetchDepartments();
@@ -113,7 +129,6 @@ const StudentInfo = () => {
   // Save updated student data
   const handleSave = async () => {
     if (!studentData) return;
-
     try {
       setIsSaving(true);
 
