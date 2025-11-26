@@ -634,15 +634,16 @@ const ApplicationDetails = ({ role }: { role: string }) => {
               Reject Application
             </Button>
 
-            <Button
-              onClick={() => setShowDeleteModal(true)}
-              variant="destructive"
-              disabled={isSubmitting}
-            >
-              <Trash className="w-4 h-4 mr-2" />
-              Delete Application
-            </Button>
-
+            {role === "examController" && (
+              <Button
+                onClick={() => setShowDeleteModal(true)}
+                variant="destructive"
+                disabled={isSubmitting}
+              >
+                <Trash className="w-4 h-4 mr-2" />
+                Delete Application
+              </Button>
+            )}
             {role === "examController" && (
               <Link
                 className="flex items-center hover:underline hover:cursor-pointer"

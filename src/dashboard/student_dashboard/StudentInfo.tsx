@@ -76,6 +76,7 @@ const StudentInfo = () => {
 
         //Set student data
         setStudentData(data.data);
+        localStorage.setItem("userData", JSON.stringify(data.data));
         setError(null);
       } catch (err) {
         console.error("Error fetching student:", err);
