@@ -42,6 +42,7 @@ const Login: React.FC = () => {
   const getDashboardRoute = (role: string): string => {
     const roleRoutes: { [key: string]: string } = {
       account: "/accounts-dashboard",
+      registrar: "/registrar-dashboard",
       faculty: "/faculty-dashboard",
       library: "/library-dashboard",
       student: "/student-dashboard",

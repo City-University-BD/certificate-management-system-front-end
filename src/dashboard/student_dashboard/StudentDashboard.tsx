@@ -16,22 +16,41 @@ interface StudentData {
 const StudentDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [studentData, setStudentData] = useState<StudentData | null>(null);
+
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
-    // Load student data from localStorage
-    const userData = localStorage.getItem("userData");
-    if (userData) {
+    const loadStudentData = async () => {
+      const userData = localStorage.getItem("userData");
+
+      if (!userData) return;
+
       try {
         const parsedData = JSON.parse(userData);
-        if (parsedData.studentData) {
-          setStudentData(parsedData.studentData);
+
+        if (parsedData.studentData && parsedData.studentData._id) {
+          const id = parsedData.studentData._id;
+
+          // Fetch student profile from API
+          const res = await fetch(
+            `https://server-side-rho-snowy.vercel.app/student/profile/${id}`
+          );
+
+          const data = await res.json();
+
+          if (data) {
+            setStudentData(data.data);
+          } else {
+            console.error("Invalid response format:", data);
+          }
         }
       } catch (error) {
-        console.error("Error parsing user data:", error);
+        console.error("Error parsing or fetching student data:", error);
       }
-    }
+    };
+
+    loadStudentData();
   }, []);
 
   const isActive = (path: string) => {

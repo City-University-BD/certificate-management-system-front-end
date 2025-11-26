@@ -15,6 +15,7 @@ import {
   XCircle,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { Link } from "react-router";
 
 interface ClearanceStatus {
   status?: number;
@@ -63,6 +64,7 @@ const StatusCheck = () => {
   const [application, setApplication] = useState<Application | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [resubmit, setResubmit] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchApplicationStatus = async () => {
@@ -94,7 +96,7 @@ const StatusCheck = () => {
         }
 
         const result = await response.json();
-
+        setResubmit(result.data.resubmit);
         if (result.status === 200 && result.data) {
           setApplication(result.data);
         } else {
@@ -536,6 +538,14 @@ const StatusCheck = () => {
           </div>
         </CardContent>
       </Card>
+
+      {resubmit && (
+        <Link to={"/student-dashboard/certificate"}>
+          <Badge className="bg-red-500 text-white p-2 hover:cursor-pointer">
+            Resubmit Application
+          </Badge>
+        </Link>
+      )}
     </div>
   );
 };

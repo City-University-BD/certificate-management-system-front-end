@@ -3,6 +3,7 @@ import ApprovedApplication from "./dashboard/exam_controller_dashboard/ApprovedA
 import ExamControllerApplicationList from "./dashboard/exam_controller_dashboard/ExamControllerApplicationList";
 import ExamControllerDashboard from "./dashboard/exam_controller_dashboard/ExamControllerDashboard";
 import FacultyDashboard from "./dashboard/faculty_dashboard/FacultyDashboard";
+import RegistrarDashboard from "./dashboard/registrar_dashboard/RegistrarDashboard";
 import StatusCheck from "./dashboard/student_dashboard/StatusCheck";
 import StudentDashboard from "./dashboard/student_dashboard/StudentDashboard";
 import StudentInfo from "./dashboard/student_dashboard/StudentInfo";
@@ -109,6 +110,29 @@ function App() {
           <Route
             path="application/:id"
             element={<ApplicationDetails role={"library"} />}
+          />
+        </Route>
+        <Route
+          path="/registrar-dashboard"
+          element={
+            <RegistrarDashboard
+              dashboard={"Registrar Dashboard"}
+              url={"/registrar-dashboard"}
+            />
+          }
+        >
+          <Route
+            index
+            element={
+              <ApplicationsList
+                role={"registrar"}
+                url={"/registrar-dashboard"}
+              />
+            }
+          />
+          <Route
+            path="application/:id"
+            element={<ApplicationDetails role={"registrar"} />}
           />
         </Route>
 

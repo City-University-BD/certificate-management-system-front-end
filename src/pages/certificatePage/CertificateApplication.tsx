@@ -92,10 +92,62 @@ const CertificateApplicationForm: React.FC = () => {
   const [errors, setErrors] = useState<FormErrors>({});
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [successMessage, setSuccessMessage] = useState<string>("");
+  const [resubmit, setResubmit] = useState<boolean>(false);
 
   // Fetch student data from localStorage and pre-fill form
+  // useEffect(() => {
+  //   const fetchStudentData = () => {
+  //     try {
+  //       setIsLoading(true);
+
+  //       // Get userData from localStorage
+  //       const userData = localStorage.getItem("userData");
+
+  //       if (!userData) {
+  //         setErrors({
+  //           general: "No user data found. Please login again.",
+  //         });
+  //         return;
+  //       }
+
+  //       // Parse the JSON data
+  //       const parsedData = JSON.parse(userData);
+
+  //       // Check if student data exists
+  //       if (!parsedData.studentData) {
+  //         setErrors({
+  //           general: "Student information not found",
+  //         });
+  //         return;
+  //       }
+
+  //       // // Set the student data
+  //       // setStudentData(parsedData.data);
+
+  //       // Pre-fill the form with student data
+  //       setFormData((prev) => ({
+  //         ...prev,
+  //         studentId: parsedData.studentData.studentId || "",
+  //         studentName: parsedData.studentData.name || "",
+  //         email: parsedData.studentData.email || "",
+  //         program: parsedData.studentData.department || "",
+  //         department: parsedData.studentData.department || "",
+  //         departmentId: parsedData.studentData.departmentId || "",
+  //       }));
+  //     } catch (err) {
+  //       console.error("Error fetching student data:", err);
+  //       setErrors({
+  //         general: "Error loading student data. Please try again.",
+  //       });
+  //     } finally {
+  //       setIsLoading(false);
+  //     }
+  //   };
+
+  //   fetchStudentData();
+  // }, []);
   useEffect(() => {
-    const fetchStudentData = () => {
+    const fetchStudentData = async () => {
       try {
         setIsLoading(true);
 
@@ -113,26 +165,57 @@ const CertificateApplicationForm: React.FC = () => {
         const parsedData = JSON.parse(userData);
 
         // Check if student data exists
-        if (!parsedData.studentData) {
+        if (!parsedData.studentData?.studentId) {
           setErrors({
-            general: "Student information not found",
+            general: "Student ID not found",
           });
           return;
         }
 
-        // // Set the student data
-        // setStudentData(parsedData.data);
+        const studentId = parsedData.studentData.studentId;
 
-        // Pre-fill the form with student data
-        setFormData((prev) => ({
-          ...prev,
-          studentId: parsedData.studentData.studentId || "",
-          studentName: parsedData.studentData.name || "",
-          email: parsedData.studentData.email || "",
-          program: parsedData.studentData.department || "",
-          department: parsedData.studentData.department || "",
-          departmentId: parsedData.studentData.departmentId || "",
-        }));
+        // Fetch application data from API
+        const response = await fetch(
+          `https://server-side-rho-snowy.vercel.app/application/own?studentId=${studentId}`
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch application data");
+        }
+
+        const result = await response.json();
+        // console.log(result.data.resubmit);
+        setResubmit(result.data.resubmit);
+
+        if (result.status === 200 && result.data) {
+          // Pre-fill the form with fetched application data
+          setFormData((prev) => ({
+            ...prev,
+            studentId: result.data.studentId || "",
+            studentName: result.data.studentName || "",
+            email: result.data.email || "",
+            program: result.data.program || "",
+            department: result.data.department || "",
+            departmentId: result.data.departmentId || "",
+            batch: result.data.batch || "",
+            creditCompleted: result.data.creditCompleted?.toString() || "",
+            creditWaived: result.data.creditWaived?.toString() || "",
+            campus: result.data.campus || "",
+            mobile: result.data.mobile || "",
+            // dateOfBirth: result.data.dateOfBirth || "",
+            dateOfBirth: String(result.data.dateOfBirth || ""),
+            lastSemester: result.data.lastSemester || "",
+            passingYear: String(result.data.passingYear || ""),
+            sscCertificate: result.data.sscCertificate || "",
+            hscCertificate: result.data.hscCertificate || "",
+            applicationType: result.data.applicationType || 0,
+            remarks: result.data.remarks || "",
+          }));
+        } else {
+          setErrors({
+            general: "No application found.",
+          });
+        }
       } catch (err) {
         console.error("Error fetching student data:", err);
         setErrors({
@@ -267,16 +350,6 @@ const CertificateApplicationForm: React.FC = () => {
         submitData.append("hscCertificate", formData.hscCertificate);
       }
 
-      // console.log("Submitting application with data:", {
-      //   studentId: formData.studentId,
-      //   studentName: formData.studentName,
-      //   program: formData.program,
-      //   email: formData.email,
-      // });
-
-      // console.log("Submitting application...", submitData);
-
-      // return;
       const response = await fetch(
         "https://server-side-rho-snowy.vercel.app/application/apply",
         {
@@ -351,6 +424,167 @@ const CertificateApplicationForm: React.FC = () => {
 
         try {
           const result = await response.json();
+          console.log(result);
+
+          if (result.errors && Array.isArray(result.errors)) {
+            const serverErrors: FormErrors = {};
+            result.errors.forEach((error: any) => {
+              if (error.field && error.message) {
+                serverErrors[error.field as keyof FormErrors] = error.message;
+              }
+            });
+            setErrors(serverErrors);
+            return;
+          } else if (result.message) {
+            errorMessage = result.message;
+          }
+        } catch (jsonError) {
+          console.log(jsonError);
+          switch (response.status) {
+            case 400:
+              errorMessage =
+                "Invalid application data. Please check your inputs.";
+              break;
+            case 500:
+              errorMessage = "Server error. Please try again later.";
+              break;
+            default:
+              errorMessage = `Application failed with status: ${response.status}`;
+          }
+        }
+
+        setErrors({ general: errorMessage });
+      }
+    } catch (error) {
+      console.error("Application error:", error);
+
+      let errorMessage =
+        "Network error. Please check your connection and try again.";
+
+      if (error instanceof TypeError && error.message.includes("fetch")) {
+        errorMessage =
+          "Unable to connect to server. Please check your internet connection.";
+      }
+
+      setErrors({ general: errorMessage });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  const handleResubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsLoading(true);
+    setErrors({});
+    setSuccessMessage("");
+
+    try {
+      const submitData = new FormData();
+      submitData.append("studentId", formData.studentId);
+      submitData.append("studentName", formData.studentName);
+      submitData.append("program", formData.program);
+      // submitData.append("department", formData.department);
+      // submitData.append("departmentId", formData.departmentId);
+      submitData.append("batch", formData.batch);
+      // submitData.append("creditCompleted", formData.creditCompleted);
+      // submitData.append("creditWaived", formData.creditWaived);
+      // submitData.append("campus", formData.campus);
+      // submitData.append("mobile", formData.mobile);
+      // submitData.append("email", formData.email);
+      // submitData.append("dateOfBirth", formData.dateOfBirth);
+      submitData.append("lastSemester", formData.lastSemester);
+      submitData.append("passingYear", formData.passingYear);
+      // submitData.append("applicationType", String(formData.applicationType));
+      submitData.append("remarks", formData.remarks);
+
+      // if (formData.sscCertificate) {
+      //   submitData.append("sscCertificate", formData.sscCertificate);
+      // }
+      // if (formData.hscCertificate) {
+      //   submitData.append("hscCertificate", formData.hscCertificate);
+      // }
+
+      const resubmitData = { ...submitData, resubmit: false };
+
+      const response = await fetch(
+        "https://server-side-rho-snowy.vercel.app/application/apply",
+        {
+          method: "POST",
+          body: resubmitData,
+        }
+      );
+
+      if (response.ok) {
+        let result;
+        try {
+          result = await response.json();
+        } catch (jsonError) {
+          console.log(jsonError);
+          result = { success: true };
+        }
+        console.log(result);
+
+        setSuccessMessage("Certificate application submitted successfully!");
+        // Update isApplied field in localStorage
+        try {
+          const userData = localStorage.getItem("userData");
+          if (userData) {
+            const parsedData = JSON.parse(userData);
+            if (parsedData.studentData) {
+              // Update the isApplied field to true
+              parsedData.studentData.isApplied = true;
+              // Save back to localStorage
+              localStorage.setItem("userData", JSON.stringify(parsedData));
+              console.log("Updated isApplied to true in localStorage");
+            }
+          }
+        } catch (localStorageError) {
+          console.error("Error updating localStorage:", localStorageError);
+        }
+
+        // Reset only the editable fields, keep student info
+        setFormData((prev) => ({
+          ...prev,
+          batch: "",
+          creditCompleted: "",
+          creditWaived: "",
+          campus: "",
+          mobile: "",
+          dateOfBirth: "",
+          lastSemester: "",
+          passingYear: "",
+          sscCertificate: null,
+          hscCertificate: null,
+          applicationType: 0,
+          remarks: "",
+        }));
+
+        const sscInput = document.getElementById(
+          "sscCertificate"
+        ) as HTMLInputElement;
+        const hscInput = document.getElementById(
+          "hscCertificate"
+        ) as HTMLInputElement;
+        if (sscInput) sscInput.value = "";
+        if (hscInput) hscInput.value = "";
+
+        // // Optionally redirect after success
+        // setTimeout(() => {
+        //   window.location.href = "/student-dashboard/status";
+        // }, 2000);
+        setTimeout(() => {
+          window.location.href = "/student-dashboard/payment";
+        }, 2000);
+      } else {
+        let errorMessage = "Application failed. Please try again.";
+
+        try {
+          const result = await response.json();
+          console.log(result);
 
           if (result.errors && Array.isArray(result.errors)) {
             const serverErrors: FormErrors = {};
@@ -789,21 +1023,39 @@ const CertificateApplicationForm: React.FC = () => {
             </div>
           </CardContent>
           <CardFooter className="flex-col gap-2">
-            <Button
-              type="submit"
-              className="w-full"
-              onClick={handleSubmit}
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Submitting Application...
-                </>
-              ) : (
-                "Submit Application"
-              )}
-            </Button>
+            {resubmit ? (
+              <Button
+                type="submit"
+                className="w-full"
+                onClick={handleResubmit}
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Submitting Application...
+                  </>
+                ) : (
+                  "Resubmit Application"
+                )}
+              </Button>
+            ) : (
+              <Button
+                type="submit"
+                className="w-full"
+                onClick={handleSubmit}
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Submitting Application...
+                  </>
+                ) : (
+                  "Submit Application"
+                )}
+              </Button>
+            )}
             <div className="text-center text-sm text-gray-600">
               Make sure all information is correct before submitting
             </div>

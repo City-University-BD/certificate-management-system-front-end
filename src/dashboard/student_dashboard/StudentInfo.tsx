@@ -56,11 +56,6 @@ const StudentInfo = () => {
         setError(null);
       } catch (err) {
         console.error("Error fetching student data:", err);
-        setError(
-          err instanceof Error
-            ? err.message
-            : "Unable to load student information. Please try again later."
-        );
       } finally {
         setIsLoading(false);
       }
@@ -77,25 +72,13 @@ const StudentInfo = () => {
           `https://server-side-rho-snowy.vercel.app/student/profile/${studentId}`
         );
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch student profile");
-        }
-
         const data = await response.json();
-        if (!data) {
-          throw new Error("Student data not found");
-        }
+
         //Set student data
         setStudentData(data.data);
-
         setError(null);
       } catch (err) {
         console.error("Error fetching student:", err);
-        setError(
-          err instanceof Error
-            ? err.message
-            : "Unable to load student information."
-        );
       } finally {
         setIsLoading(false);
       }
