@@ -65,23 +65,23 @@ const ApplicationsList = ({ role, url }: { role: string; url: string }) => {
     }
   }, [role]);
 
-  const getStatusBadge = (status: number) => {
-    const statusMap = {
-      0: { label: "Pending", color: "bg-yellow-100 text-yellow-800" },
-      1: { label: "In Progress", color: "bg-blue-100 text-blue-800" },
-      2: { label: "Approved", color: "bg-green-100 text-green-800" },
-      3: { label: "Rejected", color: "bg-red-100 text-red-800" },
-    };
-    const statusInfo =
-      statusMap[status as keyof typeof statusMap] || statusMap[0];
-    return (
-      <span
-        className={`px-3 py-1 rounded-full text-xs font-semibold ${statusInfo.color}`}
-      >
-        {statusInfo.label}
-      </span>
-    );
-  };
+  // const getStatusBadge = (status: number) => {
+  //   const statusMap = {
+  //     0: { label: "Pending", color: "bg-yellow-100 text-yellow-800" },
+  //     1: { label: "In Progress", color: "bg-blue-100 text-blue-800" },
+  //     2: { label: "Approved", color: "bg-green-100 text-green-800" },
+  //     3: { label: "Rejected", color: "bg-red-100 text-red-800" },
+  //   };
+  //   const statusInfo =
+  //     statusMap[status as keyof typeof statusMap] || statusMap[0];
+  //   return (
+  //     <span
+  //       className={`px-3 py-1 rounded-full text-xs font-semibold ${statusInfo.color}`}
+  //     >
+  //       {statusInfo.label}
+  //     </span>
+  //   );
+  // };
 
   const getApplicationType = (type: number) => {
     return type === 0 ? "Provisional" : "Final";
@@ -190,7 +190,7 @@ const ApplicationsList = ({ role, url }: { role: string; url: string }) => {
                     <h3 className="text-lg font-semibold text-gray-900">
                       {app.studentName}
                     </h3>
-                    {getStatusBadge(app.applicationStatus)}
+                    {/* {getStatusBadge(app.applicationStatus)} */}
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 text-sm text-gray-600">

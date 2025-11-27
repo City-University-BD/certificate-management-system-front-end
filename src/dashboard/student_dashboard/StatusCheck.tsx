@@ -8,7 +8,6 @@ import {
 } from "@/components/ui/card";
 import {
   CheckCircle,
-  Clock,
   Download,
   FileText,
   Loader2,
@@ -28,9 +27,7 @@ interface Clearance {
   accounts: ClearanceStatus;
   library: ClearanceStatus;
   examController: ClearanceStatus;
-  administrator: ClearanceStatus;
-  hod: ClearanceStatus;
-  controller: ClearanceStatus;
+  register: ClearanceStatus;
 }
 
 interface Application {
@@ -64,7 +61,7 @@ const StatusCheck = () => {
   const [application, setApplication] = useState<Application | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [resubmit, setResubmit] = useState<boolean>(false);
+  const [resubmit, setResubmit] = useState<number>(0);
 
   useEffect(() => {
     const fetchApplicationStatus = async () => {
@@ -96,7 +93,7 @@ const StatusCheck = () => {
         }
 
         const result = await response.json();
-        setResubmit(result.data.resubmit);
+        setResubmit(result.data?.applicationStatus);
         if (result.status === 200 && result.data) {
           setApplication(result.data);
         } else {
@@ -152,61 +149,28 @@ const StatusCheck = () => {
     }
   };
 
-  // const getClearanceStatusIcon = (status?: number) => {
-  //   if (status === undefined)
-  //     return <Clock className="h-5 w-5 text-yellow-500" />;
-
-  //   switch (status) {
-  //     case 0:
-  //       return <Clock className="h-5 w-5 text-yellow-500" />;
-  //     case 1:
-  //       return <CheckCircle className="h-5 w-5 text-green-500" />;
-  //     case 2:
-  //       return <XCircle className="h-5 w-5 text-red-500" />;
-  //     default:
-  //       return <Clock className="h-5 w-5 text-gray-500" />;
-  //   }
-  // };
-
-  // const getClearanceStatusText = (status?: number) => {
-  //   if (status === undefined) return "Pending";
-
-  //   switch (status) {
-  //     case 0:
-  //       return "Pending";
-  //     case 1:
-  //       return "Approved";
-  //     case 2:
-  //       return "Rejected";
-  //     default:
-  //       return "Unknown";
-  //   }
-  // };
-
   const clearanceSteps = [
     { label: "Exam Controller", key: "examController" },
     { label: "Faculty", key: "faculty" },
-    { label: "Accounts", key: "accounts" },
     { label: "Library", key: "library" },
-    { label: "HOD", key: "hod" },
-    { label: "Administrator", key: "administrator" },
+    { label: "Accounts", key: "accounts" },
+    { label: "Register", key: "register" },
   ];
 
   const getCurrentClearanceStep = (clearance: Clearance) => {
     const steps = [
       "examController",
       "faculty",
-      "accounts",
       "library",
-      "hod",
-      "administrator",
+      "accounts",
+      "register",
     ];
 
     // Find the last approved step
     let lastApproved = -1;
     for (let i = 0; i < steps.length; i++) {
       const stepKey = steps[i] as keyof Clearance;
-      if (clearance[stepKey].status === 1) {
+      if (clearance[stepKey]?.status === 1) {
         lastApproved = i;
       }
     }
@@ -214,7 +178,7 @@ const StatusCheck = () => {
     // Check if any step is rejected
     for (let i = 0; i < steps.length; i++) {
       const stepKey = steps[i] as keyof Clearance;
-      if (clearance[stepKey].status === 2) {
+      if (clearance[stepKey]?.status === 2) {
         return { currentStep: i, isRejected: true };
       }
     }
@@ -329,7 +293,8 @@ const StatusCheck = () => {
               <div className="flex justify-between items-start min-w-max px-4">
                 {clearanceSteps.map((step, index) => {
                   const stepKey = step.key as keyof Clearance;
-                  const stepStatus = application.clearance[stepKey].status;
+                  const stepStatus = application.clearance[stepKey]?.status;
+                  console.log(stepStatus);
                   const isCompleted = stepStatus === 1;
                   const isCurrent = index === currentStep && !isCompleted;
                   // const isUpcoming = index > currentStep;
@@ -360,15 +325,15 @@ const StatusCheck = () => {
                         className={`w-10 h-10 rounded-full flex items-center justify-center border-2 mb-2 transition-all ${
                           isCompleted
                             ? "bg-green-500 border-green-500"
-                            : isCurrent
-                            ? "bg-blue-500 border-blue-500"
+                            : stepStatus === -1
+                            ? "bg-red-500 border-red-500"
                             : "bg-white border-gray-300"
                         }`}
                       >
                         {isCompleted ? (
                           <CheckCircle className="h-6 w-6 text-white" />
-                        ) : isCurrent ? (
-                          <Clock className="h-6 w-6 text-white" />
+                        ) : stepStatus === -1 ? (
+                          <XCircle className="h-6 w-6 text-white" />
                         ) : (
                           <span className="text-gray-400 font-semibold text-xs">
                             {index + 1}
@@ -388,14 +353,19 @@ const StatusCheck = () => {
                       </p>
 
                       {/* Step Status */}
-                      {isCurrent && (
+                      {stepStatus === 0 && (
                         <Badge className="mt-2 bg-blue-500 text-xs">
                           Pending
                         </Badge>
                       )}
-                      {isCompleted && (
+                      {stepStatus === 1 && (
                         <Badge className="mt-2 bg-green-500 text-xs">
                           Approved
+                        </Badge>
+                      )}
+                      {stepStatus === -1 && (
+                        <Badge className="mt-2 bg-red-500 text-xs">
+                          Rejected
                         </Badge>
                       )}
                     </div>
@@ -539,7 +509,7 @@ const StatusCheck = () => {
         </CardContent>
       </Card>
 
-      {resubmit && (
+      {resubmit === -1 && (
         <Link to={"/student-dashboard/certificate"}>
           <Badge className="bg-red-500 text-white p-2 hover:cursor-pointer">
             Resubmit Application

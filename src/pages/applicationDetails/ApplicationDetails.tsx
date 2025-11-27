@@ -142,6 +142,9 @@ const ApplicationDetails = ({ role }: { role: string }) => {
         setApplication(data.data);
         // setApproved(true);
         toast("Application approved successfully ✅");
+        setTimeout(() => {
+          handleGoBack();
+        }, 500);
       } else {
         throw new Error(data.message || "Approval failed");
       }
@@ -169,7 +172,9 @@ const ApplicationDetails = ({ role }: { role: string }) => {
       const data = await res.json();
       if (res.ok) {
         toast("Application Delete successfully ✅");
-        navigate(-1);
+        setTimeout(() => {
+          handleGoBack();
+        }, 500);
       } else {
         throw new Error(data.message || "Approval failed");
       }
@@ -194,7 +199,7 @@ const ApplicationDetails = ({ role }: { role: string }) => {
 
       const data = await res.json();
       if (res.ok) {
-        toast.success("Application rejected ❌");
+        toast.error("Application rejected ");
         setApplication((prev) =>
           prev
             ? {
@@ -212,6 +217,9 @@ const ApplicationDetails = ({ role }: { role: string }) => {
         );
         setShowRejectModal(false);
         setRejectMessage("");
+        setTimeout(() => {
+          handleGoBack();
+        }, 500);
       } else {
         throw new Error(data.message || "Rejection failed");
       }
@@ -612,28 +620,31 @@ const ApplicationDetails = ({ role }: { role: string }) => {
       <Card>
         <CardContent className="pt-6">
           <div className="flex flex-wrap gap-3">
-            <Button
-              onClick={handleApprove}
-              disabled={isSubmitting}
-              className="bg-green-600 hover:bg-green-700"
-            >
-              {isSubmitting ? (
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              ) : (
-                <CheckCircle className="w-4 h-4 mr-2" />
-              )}
-              Approve Application
-            </Button>
+            {application.applicationStatus !== -1 && (
+              <div className="flex gap-3">
+                <Button
+                  onClick={handleApprove}
+                  disabled={isSubmitting}
+                  className="bg-green-600 hover:bg-green-700"
+                >
+                  {isSubmitting ? (
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  ) : (
+                    <CheckCircle className="w-4 h-4 mr-2" />
+                  )}
+                  Approve Application
+                </Button>
 
-            <Button
-              onClick={() => setShowRejectModal(true)}
-              variant="destructive"
-              disabled={isSubmitting}
-            >
-              <XCircle className="w-4 h-4 mr-2" />
-              Reject Application
-            </Button>
-
+                <Button
+                  onClick={() => setShowRejectModal(true)}
+                  variant="destructive"
+                  disabled={isSubmitting}
+                >
+                  <XCircle className="w-4 h-4 mr-2" />
+                  Reject Application
+                </Button>
+              </div>
+            )}
             {role === "examController" && (
               <Button
                 onClick={() => setShowDeleteModal(true)}

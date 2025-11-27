@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 
 interface FormData {
   studentId: string;
@@ -92,8 +93,9 @@ const CertificateApplicationForm: React.FC = () => {
   const [errors, setErrors] = useState<FormErrors>({});
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [successMessage, setSuccessMessage] = useState<string>("");
-  const [resubmit, setResubmit] = useState<boolean>(false);
-
+  const [applicationId, setApplicationID] = useState<string>("");
+  const [resubmit, setResubmit] = useState<number>(0);
+  const navigate = useNavigate();
   // Fetch student data from localStorage and pre-fill form
   // useEffect(() => {
   //   const fetchStudentData = () => {
@@ -184,8 +186,8 @@ const CertificateApplicationForm: React.FC = () => {
         }
 
         const result = await response.json();
-        // console.log(result.data.resubmit);
-        setResubmit(result.data.resubmit);
+        setResubmit(result.data.applicationStatus);
+        setApplicationID(result.data._id);
 
         if (result.status === 200 && result.data) {
           // Pre-fill the form with fetched application data
@@ -481,25 +483,28 @@ const CertificateApplicationForm: React.FC = () => {
     setIsLoading(true);
     setErrors({});
     setSuccessMessage("");
-
+    // console.log(applicationId);
     try {
-      const submitData = new FormData();
-      submitData.append("studentId", formData.studentId);
-      submitData.append("studentName", formData.studentName);
-      submitData.append("program", formData.program);
+      console.log(formData);
+
+      const resubmitData = new FormData();
+      resubmitData.append("studentId", formData.studentId);
+      resubmitData.append("studentName", formData.studentName);
+      resubmitData.append("program", formData.program);
       // submitData.append("department", formData.department);
       // submitData.append("departmentId", formData.departmentId);
-      submitData.append("batch", formData.batch);
+      resubmitData.append("batch", formData.batch);
       // submitData.append("creditCompleted", formData.creditCompleted);
       // submitData.append("creditWaived", formData.creditWaived);
       // submitData.append("campus", formData.campus);
       // submitData.append("mobile", formData.mobile);
       // submitData.append("email", formData.email);
       // submitData.append("dateOfBirth", formData.dateOfBirth);
-      submitData.append("lastSemester", formData.lastSemester);
-      submitData.append("passingYear", formData.passingYear);
+      resubmitData.append("lastSemester", formData.lastSemester);
+      resubmitData.append("passingYear", formData.passingYear);
       // submitData.append("applicationType", String(formData.applicationType));
-      submitData.append("remarks", formData.remarks);
+      resubmitData.append("remarks", formData.remarks);
+      resubmitData.append("resubmit", "true");
 
       // if (formData.sscCertificate) {
       //   submitData.append("sscCertificate", formData.sscCertificate);
@@ -508,12 +513,15 @@ const CertificateApplicationForm: React.FC = () => {
       //   submitData.append("hscCertificate", formData.hscCertificate);
       // }
 
-      const resubmitData = { ...submitData, resubmit: false };
+      // const finalResubmitData = { ...resubmitData, resubmit: true };
+      // console.log(finalResubmitData);
+      // console.log([...resubmitData]);
+      // return;
 
       const response = await fetch(
-        "https://server-side-rho-snowy.vercel.app/application/apply",
+        `https://server-side-rho-snowy.vercel.app/application/${applicationId}`,
         {
-          method: "POST",
+          method: "PUT",
           body: resubmitData,
         }
       );
@@ -528,12 +536,14 @@ const CertificateApplicationForm: React.FC = () => {
         }
         console.log(result);
 
-        setSuccessMessage("Certificate application submitted successfully!");
+        setSuccessMessage("Certificate application Resubmitted successfully!");
+        navigate("/student-dashboard/status");
         // Update isApplied field in localStorage
         try {
           const userData = localStorage.getItem("userData");
+
           if (userData) {
-            const parsedData = JSON.parse(userData);
+            const parsedData = JSON.parse(userData!);
             if (parsedData.studentData) {
               // Update the isApplied field to true
               parsedData.studentData.isApplied = true;
@@ -571,14 +581,6 @@ const CertificateApplicationForm: React.FC = () => {
         ) as HTMLInputElement;
         if (sscInput) sscInput.value = "";
         if (hscInput) hscInput.value = "";
-
-        // // Optionally redirect after success
-        // setTimeout(() => {
-        //   window.location.href = "/student-dashboard/status";
-        // }, 2000);
-        setTimeout(() => {
-          window.location.href = "/student-dashboard/payment";
-        }, 2000);
       } else {
         let errorMessage = "Application failed. Please try again.";
 
@@ -1023,7 +1025,7 @@ const CertificateApplicationForm: React.FC = () => {
             </div>
           </CardContent>
           <CardFooter className="flex-col gap-2">
-            {resubmit ? (
+            {resubmit === -1 ? (
               <Button
                 type="submit"
                 className="w-full"
