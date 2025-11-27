@@ -42,7 +42,6 @@ const ExamControllerApplicationList = ({ url }: { url: string }) => {
         const userData = localStorage.getItem("userData");
         const parsedUser = userData ? JSON.parse(userData) : null;
         const examId = parsedUser?.data?.examId;
-        console.log(examId);
 
         if (!examId) {
           throw new Error("Exam ID not found in localStorage");
@@ -266,7 +265,7 @@ const ExamControllerApplicationList = ({ url }: { url: string }) => {
                 <div className="flex flex-col gap-2 lg:min-w-[180px]">
                   <Button variant="outline" className="w-full justify-start">
                     <Eye className="w-4 h-4 mr-2" />
-                    <Link to={`${url}/application/${app._id}`}>
+                    <Link to={`application/${app._id}`}>
                       View Details
                     </Link>
                   </Button>

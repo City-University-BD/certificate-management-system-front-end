@@ -183,8 +183,8 @@ const ApprovedApplication = () => {
 
       {/* Applications List */}
       <div className="grid gap-4">
-        {filteredApplications.map((app) => (
-          <Card key={app._id} className="hover:shadow-md transition-shadow">
+        {filteredApplications.map((app) => ( 
+          <Card key={app._id} className="hover:shadow-md transition-shadow"> 
             <CardContent className="pt-6">
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                 <div className="flex-1 space-y-3">
@@ -258,9 +258,7 @@ const ApprovedApplication = () => {
                 <div className="flex flex-col gap-2 lg:min-w-[180px]">
                   <Button variant="outline" className="w-full justify-start">
                     <Eye className="w-4 h-4 mr-2" />
-                    <Link
-                      to={`exam-controller-dashboard/application/${app._id}`}
-                    >
+                    <Link to={`application/${app._id}`}>
                       View Details
                     </Link>
                   </Button>

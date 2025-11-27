@@ -97,57 +97,59 @@ const CertificateApplicationForm: React.FC = () => {
   const [resubmit, setResubmit] = useState<number>(0);
   const navigate = useNavigate();
   // Fetch student data from localStorage and pre-fill form
-  // useEffect(() => {
-  //   const fetchStudentData = () => {
-  //     try {
-  //       setIsLoading(true);
+  
+  useEffect(() => {
+    const fetchStudentData = () => {
+      try {
+        setIsLoading(true);
 
-  //       // Get userData from localStorage
-  //       const userData = localStorage.getItem("userData");
+        // Get userData from localStorage
+        const userData = localStorage.getItem("userData");
 
-  //       if (!userData) {
-  //         setErrors({
-  //           general: "No user data found. Please login again.",
-  //         });
-  //         return;
-  //       }
+        if (!userData) {
+          setErrors({
+            general: "No user data found. Please login again.",
+          });
+          return;
+        }
 
-  //       // Parse the JSON data
-  //       const parsedData = JSON.parse(userData);
+        // Parse the JSON data
+        const parsedData = JSON.parse(userData);
 
-  //       // Check if student data exists
-  //       if (!parsedData.studentData) {
-  //         setErrors({
-  //           general: "Student information not found",
-  //         });
-  //         return;
-  //       }
+        // Check if student data exists
+        if (!parsedData.studentData) {
+          setErrors({
+            general: "Student information not found",
+          });
+          return;
+        }
 
   //       // // Set the student data
-  //       // setStudentData(parsedData.data);
+        // setStudentData(parsedData.data);
 
   //       // Pre-fill the form with student data
-  //       setFormData((prev) => ({
-  //         ...prev,
-  //         studentId: parsedData.studentData.studentId || "",
-  //         studentName: parsedData.studentData.name || "",
-  //         email: parsedData.studentData.email || "",
-  //         program: parsedData.studentData.department || "",
-  //         department: parsedData.studentData.department || "",
-  //         departmentId: parsedData.studentData.departmentId || "",
-  //       }));
-  //     } catch (err) {
-  //       console.error("Error fetching student data:", err);
-  //       setErrors({
-  //         general: "Error loading student data. Please try again.",
-  //       });
-  //     } finally {
-  //       setIsLoading(false);
-  //     }
-  //   };
+        setFormData((prev) => ({
+          ...prev,
+          studentId: parsedData.studentData.studentId || "",
+          studentName: parsedData.studentData.name || "",
+          email: parsedData.studentData.email || "",
+          program: parsedData.studentData.department || "",
+          department: parsedData.studentData.department || "",
+          departmentId: parsedData.studentData.departmentId || "",
+        }));
+      } catch (err) {
+        console.error("Error fetching student data:", err);
+        setErrors({
+          general: "Error loading student data. Please try again.",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  //   fetchStudentData();
-  // }, []);
+    fetchStudentData();
+  }, []);
+
   useEffect(() => {
     const fetchStudentData = async () => {
       try {
@@ -176,7 +178,11 @@ const CertificateApplicationForm: React.FC = () => {
 
         const studentId = parsedData?.studentId;
 
-        // Fetch application data from API
+        const isApplied = parsedData?.isApplied;
+        console.log(isApplied);
+
+        if(isApplied === true){
+// Fetch application data from API
         const response = await fetch(
           `https://server-side-rho-snowy.vercel.app/application/own?studentId=${studentId}`
         );
@@ -218,7 +224,9 @@ const CertificateApplicationForm: React.FC = () => {
             general: "No application found.",
           });
         }
-      } catch (err) {
+      }
+        }
+         catch (err) {
         console.error("Error fetching student data:", err);
         setErrors({
           general: "Error loading student data. Please try again.",

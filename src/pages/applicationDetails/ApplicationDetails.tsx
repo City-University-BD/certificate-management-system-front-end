@@ -63,14 +63,13 @@ interface ApplicationData {
     accounts: ClearanceItem;
     library: ClearanceItem;
     examController: ClearanceItem;
-    administrator: ClearanceItem;
-    hod: ClearanceItem;
-    controller: ClearanceItem;
+    registrar: ClearanceItem;
   };
 }
 
 const ApplicationDetails = ({ role }: { role: string }) => {
   const { id } = useParams();
+  console.log(id);
   const navigate = useNavigate();
   const [application, setApplication] = useState<ApplicationData | null>(null);
   // const [isApproved, setApproved] = useState(false);
@@ -620,7 +619,7 @@ const ApplicationDetails = ({ role }: { role: string }) => {
       <Card>
         <CardContent className="pt-6">
           <div className="flex flex-wrap gap-3">
-            {application.applicationStatus !== -1 && (
+            {(application.applicationStatus !== -1 && application.applicationStatus !== 5) && (
               <div className="flex gap-3">
                 <Button
                   onClick={handleApprove}
@@ -645,7 +644,7 @@ const ApplicationDetails = ({ role }: { role: string }) => {
                 </Button>
               </div>
             )}
-            {role === "examController" && (
+            {role === "examController" && application.applicationStatus === 0 && (
               <Button
                 onClick={() => setShowDeleteModal(true)}
                 variant="destructive"

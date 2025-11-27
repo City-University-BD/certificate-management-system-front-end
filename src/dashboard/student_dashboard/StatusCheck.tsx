@@ -149,6 +149,7 @@ const StatusCheck = () => {
     }
   };
 
+
   const clearanceSteps = [
     { label: "Exam Controller", key: "examController" },
     { label: "Faculty", key: "faculty" },
