@@ -25,7 +25,7 @@ interface Application {
   };
 }
 
-const ExamControllerApplicationList = ({ url }: { url: string }) => {
+const ExamControllerApplicationList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [applications, setApplications] = useState<Application[]>([]);

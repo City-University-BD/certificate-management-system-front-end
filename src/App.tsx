@@ -37,7 +37,6 @@ function App() {
             index
             element={
               <ExamControllerApplicationList
-                url={"/exam-controller-dashboard"}
               />
             }
           />
