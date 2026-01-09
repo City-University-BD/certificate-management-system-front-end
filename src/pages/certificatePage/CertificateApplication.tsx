@@ -95,9 +95,12 @@ const CertificateApplicationForm: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState<string>("");
   const [applicationId, setApplicationID] = useState<string>("");
   const [resubmit, setResubmit] = useState<number>(0);
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: 50 }, (_, i) => currentYear - i);
+
   const navigate = useNavigate();
   // Fetch student data from localStorage and pre-fill form
-  
+
   useEffect(() => {
     const fetchStudentData = () => {
       try {
@@ -124,10 +127,10 @@ const CertificateApplicationForm: React.FC = () => {
           return;
         }
 
-  //       // // Set the student data
+        //       // // Set the student data
         // setStudentData(parsedData.data);
 
-  //       // Pre-fill the form with student data
+        //       // Pre-fill the form with student data
         setFormData((prev) => ({
           ...prev,
           studentId: parsedData.studentData.studentId || "",
@@ -181,52 +184,51 @@ const CertificateApplicationForm: React.FC = () => {
         const isApplied = parsedData?.isApplied;
         console.log(isApplied);
 
-        if(isApplied === true){
-// Fetch application data from API
-        const response = await fetch(
-          `https://server-side-rho-snowy.vercel.app/application/own?studentId=${studentId}`
-        );
+        if (isApplied === true) {
+          // Fetch application data from API
+          const response = await fetch(
+            `https://server-side-rho-snowy.vercel.app/application/own?studentId=${studentId}`
+          );
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch application data");
-        }
+          if (!response.ok) {
+            throw new Error("Failed to fetch application data");
+          }
 
-        const result = await response.json();
-        setResubmit(result.data.applicationStatus);
-        setApplicationID(result.data._id);
+          const result = await response.json();
+          setResubmit(result.data.applicationStatus);
+          setApplicationID(result.data._id);
 
-        if (result.status === 200 && result.data) {
-          // Pre-fill the form with fetched application data
-          setFormData((prev) => ({
-            ...prev,
-            studentId: result.data.studentId || "",
-            studentName: result.data.studentName || "",
-            email: result.data.email || "",
-            program: result.data.program || "",
-            department: result.data.department || "",
-            departmentId: result.data.departmentId || "",
-            batch: result.data.batch || "",
-            creditCompleted: result.data.creditCompleted?.toString() || "",
-            creditWaived: result.data.creditWaived?.toString() || "",
-            campus: result.data.campus || "",
-            mobile: result.data.mobile || "",
-            // dateOfBirth: result.data.dateOfBirth || "",
-            dateOfBirth: String(result.data.dateOfBirth || ""),
-            lastSemester: result.data.lastSemester || "",
-            passingYear: String(result.data.passingYear || ""),
-            sscCertificate: result.data.sscCertificate || "",
-            hscCertificate: result.data.hscCertificate || "",
-            applicationType: result.data.applicationType || 0,
-            remarks: result.data.remarks || "",
-          }));
-        } else {
-          setErrors({
-            general: "No application found.",
-          });
+          if (result.status === 200 && result.data) {
+            // Pre-fill the form with fetched application data
+            setFormData((prev) => ({
+              ...prev,
+              studentId: result.data.studentId || "",
+              studentName: result.data.studentName || "",
+              email: result.data.email || "",
+              program: result.data.program || "",
+              department: result.data.department || "",
+              departmentId: result.data.departmentId || "",
+              batch: result.data.batch || "",
+              creditCompleted: result.data.creditCompleted?.toString() || "",
+              creditWaived: result.data.creditWaived?.toString() || "",
+              campus: result.data.campus || "",
+              mobile: result.data.mobile || "",
+              // dateOfBirth: result.data.dateOfBirth || "",
+              dateOfBirth: String(result.data.dateOfBirth || ""),
+              lastSemester: result.data.lastSemester || "",
+              passingYear: String(result.data.passingYear || ""),
+              sscCertificate: result.data.sscCertificate || "",
+              hscCertificate: result.data.hscCertificate || "",
+              applicationType: result.data.applicationType || 0,
+              remarks: result.data.remarks || "",
+            }));
+          } else {
+            setErrors({
+              general: "No application found.",
+            });
+          }
         }
-      }
-        }
-         catch (err) {
+      } catch (err) {
         console.error("Error fetching student data:", err);
         setErrors({
           general: "Error loading student data. Please try again.",
@@ -870,9 +872,7 @@ const CertificateApplicationForm: React.FC = () => {
                 >
                   <option value="">Select your campus</option>
                   <option value="Main Campus">Main Campus</option>
-                  <option value="North Campus">North Campus</option>
-                  <option value="South Campus">South Campus</option>
-                  <option value="East Campus">East Campus</option>
+                  <option value="City Campus">City Campus</option>
                 </select>
                 {errors.campus && (
                   <p className="text-sm text-red-500">{errors.campus}</p>
@@ -896,7 +896,7 @@ const CertificateApplicationForm: React.FC = () => {
                   )}
                 </div>
 
-                <div className="grid gap-2">
+                {/* <div className="grid gap-2">
                   <Label htmlFor="passingYear">Passing Year *</Label>
                   <Input
                     id="passingYear"
@@ -908,6 +908,29 @@ const CertificateApplicationForm: React.FC = () => {
                     className={errors.passingYear ? "border-red-500" : ""}
                     required
                   />
+                  {errors.passingYear && (
+                    <p className="text-sm text-red-500">{errors.passingYear}</p>
+                  )}
+                </div> */}
+                <div className="grid gap-2">
+                  <Label htmlFor="passingYear">Passing Year *</Label>
+                  <select
+                    id="passingYear"
+                    name="passingYear"
+                    value={formData.passingYear || currentYear}
+                    onChange={handleInputChange}
+                    className={`border rounded-md p-2 ${
+                      errors.passingYear ? "border-red-500" : ""
+                    }`}
+                    required
+                  >
+                    {years.map((year) => (
+                      <option key={year} value={year}>
+                        {year}
+                      </option>
+                    ))}
+                  </select>
+
                   {errors.passingYear && (
                     <p className="text-sm text-red-500">{errors.passingYear}</p>
                   )}
@@ -927,12 +950,9 @@ const CertificateApplicationForm: React.FC = () => {
                   required
                 >
                   <option value="">Select your last semester</option>
-                  <option value="Spring 2024">Spring 2024</option>
-                  <option value="Summer 2024">Summer 2024</option>
-                  <option value="Fall 2024">Fall 2024</option>
-                  <option value="Spring 2025">Spring 2025</option>
-                  <option value="Summer 2025">Summer 2025</option>
-                  <option value="Fall 2025">Fall 2025</option>
+                  <option value="Spring">Spring</option>
+                  <option value="Summer">Summer</option>
+                  <option value="Fall">Fall</option>
                 </select>
                 {errors.lastSemester && (
                   <p className="text-sm text-red-500">{errors.lastSemester}</p>

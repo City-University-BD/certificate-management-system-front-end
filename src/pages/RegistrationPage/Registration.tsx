@@ -464,21 +464,6 @@ const Registration: React.FC = () => {
                 <p className="text-sm text-red-500">{errors.confirmPassword}</p>
               )}
             </div>
-
-            <div className="grid gap-2">
-              <Label htmlFor="image">Profile Image (Optional)</Label>
-              <Input
-                id="image"
-                name="image"
-                type="file"
-                accept="image/*"
-                onChange={handleInputChange}
-                className="file:mr-2 file:px-2 file:py-1 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-              />
-              <p className="text-xs text-gray-500">
-                Upload a profile picture (optional)
-              </p>
-            </div>
           </CardContent>
           <CardFooter className="flex-col gap-2">
             <Button
