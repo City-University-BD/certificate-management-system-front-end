@@ -68,6 +68,7 @@ const ExamControllerDashboard = () => {
             signature: base64String,
           };
           setExamController(updatedInfo);
+          console.log(updatedInfo);
 
           // Update localStorage
           const userData = localStorage.getItem("userData");

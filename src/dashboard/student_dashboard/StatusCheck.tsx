@@ -149,7 +149,6 @@ const StatusCheck = () => {
     }
   };
 
-
   const clearanceSteps = [
     { label: "Exam Controller", key: "examController" },
     { label: "Faculty", key: "faculty" },
@@ -264,7 +263,7 @@ const StatusCheck = () => {
           <p className="text-gray-600 mt-1 text-right">
             Your tracking Id:{" "}
             <span className="hover:cursor-pointer hover:underline text-blue-500">
-              {application?._id}
+              {application?.studentId}
             </span>
           </p>
         </div>

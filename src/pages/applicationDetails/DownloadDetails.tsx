@@ -320,30 +320,6 @@ const DownloadDetails = () => {
             </div>
           </div>
 
-          {/* Important Note */}
-          <div className="mb-6 bg-yellow-50 border-l-4 border-yellow-400 p-4">
-            <p className="text-sm font-medium text-gray-800">
-              <strong>Important:</strong> Before submission of this form, please
-              return the ID card and Library card
-            </p>
-          </div>
-
-          {/* Signature Section */}
-          <div className="mb-8 border-t-2 border-gray-300 pt-4">
-            <div className="flex justify-between items-end">
-              <div>
-                <div className="border-t-2 border-gray-800 w-64 mt-12 pt-2">
-                  <p className="text-sm text-center">Student Signature</p>
-                </div>
-              </div>
-              <div>
-                <div className="border-t-2 border-gray-800 w-48 mt-12 pt-2">
-                  <p className="text-sm text-center">Date</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
           {/* Clearance Table */}
           <div className="mt-8">
             <h3 className="text-lg font-semibold mb-4 bg-gray-800 text-white px-4 py-2">
@@ -387,10 +363,17 @@ const DownloadDetails = () => {
                       </div>
                     </div>
                   </td>
+
                   <td className="border-2 border-gray-800 p-4 align-top">
-                    <div className="h-20"></div>
-                    <p className="text-xs text-gray-600 italic mt-2">
-                      Head of Department
+                    <div className="h-20">
+                      <img
+                        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTmFvhzGt57tLPmeVbJ-v848K76u6GD2yQhpQ&s"
+                        alt=""
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                    <p className="text-xs text-gray-600 italic mt-2 text-center">
+                      Head of Department{" "}
                     </p>
                   </td>
                 </tr>
@@ -416,9 +399,16 @@ const DownloadDetails = () => {
                       </div>
                     </div>
                   </td>
+
                   <td className="border-2 border-gray-800 p-4 align-top">
-                    <div className="h-20"></div>
-                    <p className="text-xs text-gray-600 italic mt-2">
+                    <div className="h-20">
+                      <img
+                        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTmFvhzGt57tLPmeVbJ-v848K76u6GD2yQhpQ&s"
+                        alt=""
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                    <p className="text-xs text-gray-600 italic mt-2 text-center">
                       Library In-charge
                     </p>
                   </td>
@@ -454,8 +444,14 @@ const DownloadDetails = () => {
                     </div>
                   </td>
                   <td className="border-2 border-gray-800 p-4 align-top">
-                    <div className="h-20"></div>
-                    <p className="text-xs text-gray-600 italic mt-2">
+                    <div className="h-20">
+                      <img
+                        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTmFvhzGt57tLPmeVbJ-v848K76u6GD2yQhpQ&s"
+                        alt=""
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                    <p className="text-xs text-gray-600 italic mt-2 text-center">
                       Accounts Officer
                     </p>
                   </td>
@@ -484,10 +480,17 @@ const DownloadDetails = () => {
                       </div>
                     </div>
                   </td>
+
                   <td className="border-2 border-gray-800 p-4 align-top">
-                    <div className="h-20"></div>
-                    <p className="text-xs text-gray-600 italic mt-2">
-                      Registrar
+                    <div className="h-20">
+                      <img
+                        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTmFvhzGt57tLPmeVbJ-v848K76u6GD2yQhpQ&s"
+                        alt=""
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                    <p className="text-xs text-gray-600 italic mt-2 text-center">
+                      Registrar{" "}
                     </p>
                   </td>
                 </tr>
@@ -515,10 +518,17 @@ const DownloadDetails = () => {
                       </div>
                     </div>
                   </td>
+
                   <td className="border-2 border-gray-800 p-4 align-top">
-                    <div className="h-20"></div>
-                    <p className="text-xs text-gray-600 italic mt-2">
-                      Controller of Examinations
+                    <div className="h-20">
+                      <img
+                        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTmFvhzGt57tLPmeVbJ-v848K76u6GD2yQhpQ&s"
+                        alt=""
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                    <p className="text-xs text-gray-600 italic mt-2 text-center">
+                      Controller of Examinations{" "}
                     </p>
                   </td>
                 </tr>
@@ -526,29 +536,27 @@ const DownloadDetails = () => {
             </table>
           </div>
 
-          {/* Contact and Collection Section */}
-          <div className="mt-8 border-2 border-gray-800 p-4 bg-blue-50">
-            <p className="text-sm font-semibold mb-3">
-              Contact after 05 working days from the submission date of this
-              form.
+          {/* Important Note */}
+          <div className="mb-6 bg-yellow-50 border-l-4 border-yellow-400 p-4">
+            <p className="text-sm font-medium text-gray-800">
+              <strong>Important:</strong> Before submission of this form, please
+              return the ID card and Library card
             </p>
-            <div className="flex items-center gap-4 mb-3">
-              <span className="text-sm">I have checked & received by</span>
-              <div className="flex items-center">
-                <div className="w-4 h-4 border-2 border-gray-800 mr-2"></div>
-                <label className="text-sm">Transcript</label>
+          </div>
+
+          {/* Signature Section */}
+          <div className="mb-8 border-t-2 border-gray-300 pt-4">
+            <div className="flex justify-between items-end">
+              <div>
+                <div className="border-t-2 border-gray-800 w-64 mt-12 pt-2">
+                  <p className="text-sm text-center">Student Signature</p>
+                </div>
               </div>
-              <div className="flex items-center">
-                <div className="w-4 h-4 border-2 border-gray-800 mr-2"></div>
-                <label className="text-sm">Provisional Certificate</label>
+              <div>
+                <div className="border-t-2 border-gray-800 w-48 mt-12 pt-2">
+                  <p className="text-sm text-center">Date</p>
+                </div>
               </div>
-            </div>
-            <p className="text-xs italic text-gray-700 mb-4">
-              N.B. Provisional Certificate must be surrendered at the time of
-              taking delivery of original certificate
-            </p>
-            <div className="border-t-2 border-gray-800 w-64 ml-auto pt-2">
-              <p className="text-sm text-center">Signature of the applicant</p>
             </div>
           </div>
 
