@@ -7,6 +7,7 @@ interface ExamControllerData {
   name: string;
   email: string;
   examId: string;
+  departments: string,
   phone: string;
   image: string;
   role: number;
@@ -207,13 +208,13 @@ const ExamControllerDashboard = () => {
                       {examControllerInfo.examId}
                     </p>
                   </div>
-                  {/* 
+                  
                   <div className="bg-gray-50 p-2 rounded-lg">
                     <p className="text-gray-500 mb-1">Department</p>
                     <p className="font-semibold text-gray-900 uppercase">
-                      {examControllerInfo.department}
+                      exam {examControllerInfo?.departments}
                     </p>
-                  </div> */}
+                  </div>
 
                   <div className="bg-gray-50 p-2 rounded-lg">
                     <p className="text-gray-500 mb-1">Email</p>

@@ -154,7 +154,7 @@ const StatusCheck = () => {
     { label: "Faculty", key: "faculty" },
     { label: "Library", key: "library" },
     { label: "Accounts", key: "accounts" },
-    { label: "Register", key: "register" },
+    { label: "Registrar", key: "registrar" },
   ];
 
   const getCurrentClearanceStep = (clearance: Clearance) => {
@@ -163,7 +163,7 @@ const StatusCheck = () => {
       "faculty",
       "library",
       "accounts",
-      "register",
+      "registrar",
     ];
 
     // Find the last approved step
