@@ -6,7 +6,7 @@ interface FacultyData {
   _id: string;
   name: string;
   email: string;
-  facultyId: string;
+  libraryId: string;
   phone: string;
   image: string;
   role: number;
@@ -30,7 +30,6 @@ const FacultyDashboard = ({ dashboard, url }: FacultyDashboardProps) => {
   useEffect(() => {
     // Load faculty info from localStorage
     const userData = localStorage.getItem("userData");
-    console.log(userData);
     if (userData) {
       try {
         const parsedData = JSON.parse(userData);
@@ -180,10 +179,10 @@ const FacultyDashboard = ({ dashboard, url }: FacultyDashboardProps) => {
                 {/* Profile Section */}
                 <div className="flex flex-col items-center text-center pb-3 border-b border-gray-100">
                   <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center mb-2">
-                      <img
+                    <img
                       src={facultyInfo?.image}
                       alt=""
-                      className="w-8 h-8"
+                      className="w-full h-full rounded-full object-cover border-4 border-white"
                     />
                   </div>
                   <p className="text-sm font-semibold text-gray-900">
@@ -197,9 +196,9 @@ const FacultyDashboard = ({ dashboard, url }: FacultyDashboardProps) => {
                 {/* Details Section */}
                 <div className="space-y-3 text-xs">
                   <div className="bg-gray-50 p-2 rounded-lg">
-                    <p className="text-gray-500 mb-1">Faculty ID</p>
+                    <p className="text-gray-500 mb-1">Library ID</p>
                     <p className="font-semibold text-gray-900">
-                      {facultyInfo.facultyId}
+                      {facultyInfo.libraryId}
                     </p>
                   </div>
 

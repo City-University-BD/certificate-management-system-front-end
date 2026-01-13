@@ -15,6 +15,7 @@ import Login from "./pages/LoginPage/Login";
 import SSLPaymentPage from "./pages/payment/SSLPaymentPage";
 import Registration from "./pages/RegistrationPage/Registration";
 import AccountDashboard from "./dashboard/account_dashboard/AccountDashboard";
+import LibraryDashboard from "./dashboard/library dashboard/libraryDashboard";
 
 function App() {
   return (
@@ -34,13 +35,7 @@ function App() {
           path="/exam-controller-dashboard"
           element={<ExamControllerDashboard />}
         >
-          <Route
-            index
-            element={
-              <ExamControllerApplicationList
-              />
-            }
-          />
+          <Route index element={<ExamControllerApplicationList />} />
           <Route
             path="approved-applications"
             element={<ApprovedApplication />}
@@ -50,7 +45,7 @@ function App() {
             element={<ApplicationDetails role={"examController"} />}
           />
 
-         <Route
+          <Route
             path="approved-applications/application/:id"
             element={<ApplicationDetails role={"examController"} />}
           />
@@ -76,14 +71,7 @@ function App() {
             element={<ApplicationDetails role={"faculty"} />}
           />
         </Route>
-        <Route
-          path="/accounts-dashboard"
-          element={
-            <AccountDashboard
-              
-            />
-          }
-        >
+        <Route path="/accounts-dashboard" element={<AccountDashboard />}>
           <Route
             index
             element={
@@ -96,15 +84,7 @@ function App() {
           />
         </Route>
 
-        <Route
-          path="/library-dashboard"
-          element={
-            <FacultyDashboard
-              dashboard={"Library Dashboard"}
-              url={"/library-dashboard"}
-            />
-          }
-        >
+        <Route path="/library-dashboard" element={<LibraryDashboard />}>
           <Route
             index
             element={
