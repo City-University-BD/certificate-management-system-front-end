@@ -36,6 +36,7 @@ const Login: React.FC = () => {
   const [errors, setErrors] = useState<LoginErrors>({});
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [successMessage, setSuccessMessage] = useState<string>("");
+  const [showPassword, setShowPassword] = useState<boolean>(false); // Password toggle
   const navigate = useNavigate();
 
   // Function to get the dashboard route based on role
@@ -74,7 +75,6 @@ const Login: React.FC = () => {
     if (!loginData.email.trim()) {
       newErrors.email = "Email is required";
     } else {
-      // Email validation
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(loginData.email)) {
         newErrors.email = "Please enter a valid email address";
@@ -96,9 +96,7 @@ const Login: React.FC = () => {
   const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
-    if (!validateForm()) {
-      return;
-    }
+    if (!validateForm()) return;
 
     setIsLoading(true);
     setErrors({});
@@ -108,32 +106,28 @@ const Login: React.FC = () => {
       const submitData = {
         email: loginData.email.trim().toLowerCase(),
         password: loginData.password,
-        // role: loginData.role,
       };
 
       const response = await fetch(
         `https://server-side-rho-snowy.vercel.app/${loginData.role}/login`,
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(submitData),
         }
       );
 
       const result = await response.json();
-     
 
       if (response.ok) {
         setSuccessMessage("Login successful! Redirecting...");
 
-        // Store authentication data if provided
-        if (result) {
-          localStorage.setItem("authToken", result.data.token)
-        }
-        if (result) {
-          localStorage.setItem("userData", JSON.stringify(result.data));
+        if (result?.data) {
+            console.log(result?.data?.user);
+          localStorage.setItem("signature", result?.data?.user?.signature);
+          localStorage.setItem("authToken", result?.user?.token);
+         localStorage.setItem("userData", JSON.stringify(result?.data?.user));
+
         }
 
         // Store the user role
@@ -143,27 +137,20 @@ const Login: React.FC = () => {
         const dashboardRoute = getDashboardRoute(loginData.role);
 
         // Clear form
-        setLoginData({
-          email: "",
-          password: "",
-          role: "",
-        });
+        setLoginData({ email: "", password: "", role: "" });
 
         // Navigate to role-specific dashboard
         setTimeout(() => {
           navigate(dashboardRoute);
         }, 1000);
       } else {
-        // Handle server errors
         if (result.errors) {
-          // If server returns field-specific errors
           const serverErrors: LoginErrors = {};
           result.errors.forEach((error: any) => {
             serverErrors[error.field as keyof LoginErrors] = error.message;
           });
           setErrors(serverErrors);
         } else {
-          // General error message
           setErrors({
             general:
               result.message || "Login failed. Please check your credentials.",
@@ -246,15 +233,24 @@ const Login: React.FC = () => {
                     Forgot password?(Upcoming)
                   </a>
                 </div>
-                <Input
-                  id="password"
-                  name="password"
-                  type="password"
-                  value={loginData.password}
-                  onChange={handleInputChange}
-                  className={errors.password ? "border-red-500" : ""}
-                  required
-                />
+                <div className="relative">
+                  <Input
+                    id="password"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    value={loginData.password}
+                    onChange={handleInputChange}
+                    className={errors.password ? "border-red-500" : ""}
+                    required
+                  />
+                  <button
+                    type="button"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-sm text-gray-500 hover:text-gray-800"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? "Hide" : "Show"}
+                  </button>
+                </div>
                 {errors.password && (
                   <p className="text-sm text-red-500">{errors.password}</p>
                 )}
@@ -267,7 +263,7 @@ const Login: React.FC = () => {
                   name="role"
                   value={loginData.role}
                   onChange={handleInputChange}
-                  className={`flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 ${
+                  className={`flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 ${
                     errors.role ? "border-red-500" : ""
                   }`}
                   required

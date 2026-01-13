@@ -27,9 +27,10 @@ import {
 import { useEffect, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { Link, useNavigate, useParams } from "react-router";
-
+ 
 interface ClearanceItem {
   status: number;
+  signature: string| null;
   date: string | null;
   message: string;
 }
@@ -121,39 +122,53 @@ const ApplicationDetails = ({ role }: { role: string }) => {
     navigate(-1);
   };
 
-  const handleApprove = async () => {
-    if (!id) return;
+const handleApprove = async () => {
+  if (!id) return;
 
-    try {
-      setIsSubmitting(true);
+  try {
+    setIsSubmitting(true);
 
-      const res = await fetch(
-        `https://server-side-rho-snowy.vercel.app/application/clearance/${role}/${id}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ status: 1, message: "" }),
-        }
-      );
+    const signature = localStorage.getItem("signature");
 
-      const data = await res.json();
-      if (res.ok) {
-        setApplication(data.data);
-        // setApproved(true);
-        toast("Application approved successfully ✅");
-        setTimeout(() => {
-          handleGoBack();
-        }, 500);
-      } else {
-        throw new Error(data.message || "Approval failed");
-      }
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Something went wrong");
-      console.log("data:", err);
-    } finally {
-      setIsSubmitting(false);
+
+    if (signature === undefined || null) {
+      toast.error("Signature not found. Please login again.");
+      return;
     }
-  };
+
+    const res = await fetch(
+      `https://server-side-rho-snowy.vercel.app/application/clearance/${role}/${id}`,
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: 1, message: "", signature }),
+      }
+    );
+
+    let data: any = null;
+    try {
+      data = await res.json();
+    } catch (err) {
+      console.warn("No JSON returned from server");
+    }
+
+    console.log(res);
+
+    if (res.ok) {
+      if (data?.data) setApplication(data.data);
+      toast.success("Application approved successfully ✅");
+      setTimeout(handleGoBack, 1000);
+    } else {
+      throw new Error(data?.message || "Approval failed");
+    }
+  } catch (err) {
+    toast.error(err instanceof Error ? err.message : "Something went wrong");
+    console.error(err);
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
 
   const handleDelete = async () => {
     if (!id) return;

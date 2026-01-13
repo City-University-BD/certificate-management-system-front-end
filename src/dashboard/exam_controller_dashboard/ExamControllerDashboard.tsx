@@ -25,14 +25,15 @@ const ExamControllerDashboard = () => {
   useEffect(() => {
     // Load faculty info from localStorage
     const userData = localStorage.getItem("userData");
+    console.log(userData);
     if (userData) {
       try {
         const parsedData = JSON.parse(userData);
-        if (parsedData.data) {
-          setExamController(parsedData.data);
+        if (parsedData) {
+          setExamController(parsedData);
           // Load signature if exists
-          if (parsedData.data.signature) {
-            setSignaturePreview(parsedData.data.signature);
+          if (parsedData.signature) {
+            setSignaturePreview(parsedData?.signature);
           }
         }
       } catch (error) {
@@ -208,13 +209,13 @@ const ExamControllerDashboard = () => {
                       {examControllerInfo.examId}
                     </p>
                   </div>
-                  
-                  <div className="bg-gray-50 p-2 rounded-lg">
+   
+               {/*  <div className="bg-gray-50 p-2 rounded-lg">
                     <p className="text-gray-500 mb-1">Department</p>
                     <p className="font-semibold text-gray-900 uppercase">
                       exam {examControllerInfo?.departments}
                     </p>
-                  </div>
+                  </div> */}
 
                   <div className="bg-gray-50 p-2 rounded-lg">
                     <p className="text-gray-500 mb-1">Email</p>

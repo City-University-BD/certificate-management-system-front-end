@@ -41,7 +41,7 @@ const ExamControllerApplicationList = () => {
         // ✅ Get examId from localStorage
         const userData = localStorage.getItem("userData");
         const parsedUser = userData ? JSON.parse(userData) : null;
-        const examId = parsedUser?.data?.examId;
+        const examId = parsedUser?.examId;
 
         if (!examId) {
           throw new Error("Exam ID not found in localStorage");
