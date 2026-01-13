@@ -192,8 +192,12 @@ const AccountDashboard = () => {
               <div className="space-y-4">
                 {/* Profile Section */}
                 <div className="flex flex-col items-center text-center pb-3 border-b border-gray-100">
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center mb-2">
-                    <User className="w-8 h-8 text-white" />
+                  <div className="w-32 h-32 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center mb-2">
+                    <img
+                      src={facultyInfo?.image}
+                      alt=""
+                      className="w-8 h-8"
+                    />
                   </div>
                   <p className="text-sm font-semibold text-gray-900">
                     {facultyInfo.name}
