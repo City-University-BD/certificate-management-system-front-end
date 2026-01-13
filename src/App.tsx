@@ -14,6 +14,7 @@ import CertificateApplicationForm from "./pages/certificatePage/CertificateAppli
 import Login from "./pages/LoginPage/Login";
 import SSLPaymentPage from "./pages/payment/SSLPaymentPage";
 import Registration from "./pages/RegistrationPage/Registration";
+import AccountDashboard from "./dashboard/account_dashboard/AccountDashboard";
 
 function App() {
   return (
@@ -78,9 +79,8 @@ function App() {
         <Route
           path="/accounts-dashboard"
           element={
-            <FacultyDashboard
-              dashboard={"Accounts Dashboard"}
-              url={"/accounts-dashboard"}
+            <AccountDashboard
+              
             />
           }
         >

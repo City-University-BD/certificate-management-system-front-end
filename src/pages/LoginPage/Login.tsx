@@ -123,13 +123,12 @@ const Login: React.FC = () => {
         setSuccessMessage("Login successful! Redirecting...");
 
         if (result?.data) {
-            console.log(result?.data?.user);
+            console.log(result?.data);
           localStorage.setItem("signature", result?.data?.user?.signature);
-          localStorage.setItem("authToken", result?.user?.token);
+          localStorage.setItem("authToken", result?.data?.token);
          localStorage.setItem("userData", JSON.stringify(result?.data?.user));
-
         }
-
+        
         // Store the user role
         localStorage.setItem("userRole", loginData.role);
 

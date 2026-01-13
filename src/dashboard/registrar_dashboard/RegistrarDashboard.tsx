@@ -6,7 +6,7 @@ interface FacultyData {
   _id: string;
   name: string;
   email: string;
-  facultyId: string;
+  registrarid : string;
   phone: string;
   image: string;
   role: number;
@@ -30,14 +30,16 @@ const RegistrarDashboard = ({ dashboard, url }: RegistrarDashboardProps) => {
   useEffect(() => {
     // Load faculty info from localStorage
     const userData = localStorage.getItem("userData");
+    console.log(userData);
     if (userData) {
       try {
         const parsedData = JSON.parse(userData);
-        if (parsedData.data) {
-          setFacultyInfo(parsedData.data);
+        console.log(parsedData);
+        if (parsedData) {
+          setFacultyInfo(parsedData);
           // Load signature if exists
-          if (parsedData.data.signature) {
-            setSignaturePreview(parsedData.data.signature);
+          if (parsedData.signature) {
+            setSignaturePreview(parsedData.signature);
           }
         }
       } catch (error) {
@@ -156,7 +158,8 @@ const RegistrarDashboard = ({ dashboard, url }: RegistrarDashboardProps) => {
           <nav className="p-4 space-y-1">
             <Link
               // onClick={() => navigate(`/${dashboard}`)}
-              to={`http://localhost:5173${url}`}
+              to={`https://certificate-management-system-iota.vercel.app/
+${url}`}
               className={`w-full flex items-center gap-3 px-4 py-3 hover:cursor-pointer rounded-lg transition-colors ${
                 isActive("/faculty-dashboard")
                   ? "bg-blue-50 text-blue-700"
@@ -183,24 +186,14 @@ const RegistrarDashboard = ({ dashboard, url }: RegistrarDashboardProps) => {
                   <p className="text-sm font-semibold text-gray-900">
                     {facultyInfo.name}
                   </p>
-                  <p className="text-xs text-gray-500 capitalize">
-                    {facultyInfo.designation}
-                  </p>
                 </div>
 
                 {/* Details Section */}
                 <div className="space-y-3 text-xs">
                   <div className="bg-gray-50 p-2 rounded-lg">
-                    <p className="text-gray-500 mb-1">Faculty ID</p>
+                    <p className="text-gray-500 mb-1">Registrar ID</p>
                     <p className="font-semibold text-gray-900">
-                      {facultyInfo.facultyId}
-                    </p>
-                  </div>
-
-                  <div className="bg-gray-50 p-2 rounded-lg">
-                    <p className="text-gray-500 mb-1">Department</p>
-                    <p className="font-semibold text-gray-900 uppercase">
-                      {facultyInfo.department}
+                      {facultyInfo.registrarid}
                     </p>
                   </div>
 

@@ -30,14 +30,16 @@ const FacultyDashboard = ({ dashboard, url }: FacultyDashboardProps) => {
   useEffect(() => {
     // Load faculty info from localStorage
     const userData = localStorage.getItem("userData");
+    console.log(userData);
     if (userData) {
       try {
         const parsedData = JSON.parse(userData);
-        if (parsedData.data) {
-          setFacultyInfo(parsedData.data);
+        console.log(parsedData);
+        if (parsedData) {
+          setFacultyInfo(parsedData);
           // Load signature if exists
-          if (parsedData.data.signature) {
-            setSignaturePreview(parsedData.data.signature);
+          if (parsedData.signature) {
+            setSignaturePreview(parsedData?.signature);
           }
         }
       } catch (error) {
@@ -156,7 +158,7 @@ const FacultyDashboard = ({ dashboard, url }: FacultyDashboardProps) => {
           <nav className="p-4 space-y-1">
             <Link
               // onClick={() => navigate(`/${dashboard}`)}
-              to={`http://localhost:5173${url}`}
+              to={`${url}`}
               className={`w-full flex items-center gap-3 px-4 py-3 hover:cursor-pointer rounded-lg transition-colors ${
                 isActive("/faculty-dashboard")
                   ? "bg-blue-50 text-blue-700"
@@ -178,7 +180,11 @@ const FacultyDashboard = ({ dashboard, url }: FacultyDashboardProps) => {
                 {/* Profile Section */}
                 <div className="flex flex-col items-center text-center pb-3 border-b border-gray-100">
                   <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center mb-2">
-                    <User className="w-8 h-8 text-white" />
+                      <img
+                      src={facultyInfo?.image}
+                      alt=""
+                      className="w-8 h-8"
+                    />
                   </div>
                   <p className="text-sm font-semibold text-gray-900">
                     {facultyInfo.name}
