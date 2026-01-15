@@ -6,7 +6,7 @@ interface FacultyData {
   _id: string;
   name: string;
   email: string;
-  accountId : string;
+  accountId: string;
   phone: string;
   image: string;
   role: number;
@@ -16,9 +16,6 @@ interface FacultyData {
 }
 
 const AccountDashboard = () => {
-
-
-
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
@@ -30,89 +27,85 @@ const AccountDashboard = () => {
     return location.pathname.includes(path);
   };
 
+  const [facultyInfo, setFacultyInfo] = useState<FacultyData | null>(null);
+  const [signaturePreview, setSignaturePreview] = useState<string | null>(null);
 
-    const [facultyInfo, setFacultyInfo] = useState<FacultyData | null>(null);
-    const [signaturePreview, setSignaturePreview] = useState<string | null>(null);
-    
-  
-    useEffect(() => {
-      // Load faculty info from localStorage
+  useEffect(() => {
+    // Load faculty info from localStorage
+    const userData = localStorage.getItem("userData");
+    console.log(userData);
+    if (userData) {
+      try {
+        const parsedData = JSON.parse(userData);
+        console.log(parsedData);
+        if (parsedData) {
+          setFacultyInfo(parsedData);
+          // Load signature if exists
+          if (parsedData.signature) {
+            setSignaturePreview(parsedData.signature);
+          }
+        }
+      } catch (error) {
+        console.error("Error parsing user data:", error);
+      }
+    }
+  }, []);
+
+  const handleSignatureUpload = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith("image/")) {
+        alert("Please upload an image file");
+        return;
+      }
+
+      // Validate file size (max 2MB)
+      if (file.size > 2 * 1024 * 1024) {
+        alert("File size should be less than 2MB");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        setSignaturePreview(base64String);
+
+        // Update facultyInfo with signature
+        if (facultyInfo) {
+          const updatedInfo = { ...facultyInfo, signature: base64String };
+          setFacultyInfo(updatedInfo);
+
+          // Update localStorage
+          const userData = localStorage.getItem("userData");
+          if (userData) {
+            const parsedData = JSON.parse(userData);
+            parsedData.data.signature = base64String;
+            localStorage.setItem("userData", JSON.stringify(parsedData));
+          }
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeSignature = () => {
+    setSignaturePreview(null);
+    if (facultyInfo) {
+      const updatedInfo = { ...facultyInfo, signature: undefined };
+      setFacultyInfo(updatedInfo);
+
+      // Update localStorage
       const userData = localStorage.getItem("userData");
-      console.log(userData);
       if (userData) {
-        try {
-          const parsedData = JSON.parse(userData);
-          console.log(parsedData);
-          if (parsedData) {
-            setFacultyInfo(parsedData);
-            // Load signature if exists
-            if (parsedData.signature) {
-              setSignaturePreview(parsedData.signature);
-            }
-          }
-        } catch (error) {
-          console.error("Error parsing user data:", error);
-        }
+        const parsedData = JSON.parse(userData);
+        delete parsedData.data.signature;
+        localStorage.setItem("userData", JSON.stringify(parsedData));
       }
-    }, []);
-  
-    const handleSignatureUpload = (
-      event: React.ChangeEvent<HTMLInputElement>
-    ) => {
-      const file = event.target.files?.[0];
-      if (file) {
-        // Validate file type
-        if (!file.type.startsWith("image/")) {
-          alert("Please upload an image file");
-          return;
-        }
-  
-        // Validate file size (max 2MB)
-        if (file.size > 2 * 1024 * 1024) {
-          alert("File size should be less than 2MB");
-          return;
-        }
-  
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          const base64String = reader.result as string;
-          setSignaturePreview(base64String);
-  
-          // Update facultyInfo with signature
-          if (facultyInfo) {
-            const updatedInfo = { ...facultyInfo, signature: base64String };
-            setFacultyInfo(updatedInfo);
-  
-            // Update localStorage
-            const userData = localStorage.getItem("userData");
-            if (userData) {
-              const parsedData = JSON.parse(userData);
-              parsedData.data.signature = base64String;
-              localStorage.setItem("userData", JSON.stringify(parsedData));
-            }
-          }
-        };
-        reader.readAsDataURL(file);
-      }
-    };
-  
-    const removeSignature = () => {
-      setSignaturePreview(null);
-      if (facultyInfo) {
-        const updatedInfo = { ...facultyInfo, signature: undefined };
-        setFacultyInfo(updatedInfo);
-  
-        // Update localStorage
-        const userData = localStorage.getItem("userData");
-        if (userData) {
-          const parsedData = JSON.parse(userData);
-          delete parsedData.data.signature;
-          localStorage.setItem("userData", JSON.stringify(parsedData));
-        }
-      }
-    };
-  
-
+    }
+  };
 
   const handleLogout = () => {
     // Clear authentication data
@@ -169,7 +162,6 @@ const AccountDashboard = () => {
             >
               <User className="w-5 h-5" />
               <span className="font-medium">My Information</span>
-
             </button>
 
             <button
@@ -184,114 +176,114 @@ const AccountDashboard = () => {
               <span className="font-medium">All Applications</span>
             </button>
 
-   <div className="flex-1 overflow-y-auto p-4 border-t border-gray-200">
-            <p className="font-semibold text-center text-gray-900 mb-3">
-              My Information
-            </p>
-            {facultyInfo ? (
-              <div className="space-y-4">
-                {/* Profile Section */}
-                <div className="flex flex-col items-center text-center pb-3 border-b border-gray-100">
-                  <div className="w-32 h-32 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center mb-2">
-                    <img
-                      src={facultyInfo?.image}
-                      alt=""
-                      className="w-8 h-8"
-                    />
+            <div className="flex-1 overflow-y-auto p-4 border-t border-gray-200">
+              <p className="font-semibold text-center text-gray-900 mb-3">
+                My Information
+              </p>
+              {facultyInfo ? (
+                <div className="space-y-4">
+                  {/* Profile Section */}
+                  <div className="flex flex-col items-center text-center pb-3 border-b border-gray-100">
+                    <div className="w-32 h-32 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center mb-2">
+                      <img
+                        src={facultyInfo?.image}
+                        alt=""
+                        className="w-full h-full rounded-full object-cover border-4 border-white"
+                      />
+                    </div>
+                    <p className="text-sm font-semibold text-gray-900">
+                      {facultyInfo.name}
+                    </p>
                   </div>
-                  <p className="text-sm font-semibold text-gray-900">
-                    {facultyInfo.name}
+
+                  {/* Details Section */}
+                  <div className="space-y-3 text-xs">
+                    <div className="bg-gray-50 p-2 rounded-lg">
+                      <p className="text-gray-500 mb-1">Account ID</p>
+                      <p className="font-semibold text-gray-900">
+                        {facultyInfo.accountId}
+                      </p>
+                    </div>
+
+                    <div className="bg-gray-50 p-2 rounded-lg">
+                      <p className="text-gray-500 mb-1">Email</p>
+                      <p className="font-medium text-gray-900 break-all">
+                        {facultyInfo.email}
+                      </p>
+                    </div>
+
+                    <div className="bg-gray-50 p-2 rounded-lg">
+                      <p className="text-gray-500 mb-1">Phone</p>
+                      <p className="font-medium text-gray-900">
+                        {facultyInfo.phone}
+                      </p>
+                    </div>
+
+                    {/* Signature Section */}
+                    <div className="bg-gray-50 p-2 rounded-lg">
+                      <p className="text-gray-500 mb-2">Digital Signature</p>
+                      {signaturePreview ? (
+                        <div className="space-y-2">
+                          <div className="bg-white border-2 border-gray-200 rounded-lg p-2 flex items-center justify-center">
+                            <img
+                              src={signaturePreview}
+                              alt="Signature"
+                              className="max-h-20 max-w-full object-contain"
+                            />
+                          </div>
+                          <div className="flex gap-2">
+                            <label className="flex-1 cursor-pointer">
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handleSignatureUpload}
+                                className="hidden"
+                              />
+                              <div className="flex items-center justify-center gap-1 px-2 py-1 bg-blue-50 text-blue-600 rounded hover:bg-blue-100 transition-colors text-xs font-medium">
+                                <Upload className="w-3 h-3" />
+                                Change
+                              </div>
+                            </label>
+                            <button
+                              onClick={removeSignature}
+                              className="flex-1 flex items-center justify-center gap-1 px-2 py-1 bg-red-50 text-red-600 rounded hover:bg-red-100 transition-colors text-xs font-medium"
+                            >
+                              <X className="w-3 h-3" />
+                              Remove
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <label className="cursor-pointer">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleSignatureUpload}
+                            className="hidden"
+                          />
+                          <div className="flex flex-col items-center justify-center py-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-all">
+                            <Upload className="w-6 h-6 text-gray-400 mb-1" />
+                            <p className="text-xs text-gray-600 font-medium">
+                              Upload Signature
+                            </p>
+                            <p className="text-xs text-gray-400 mt-0.5">
+                              PNG, JPG (Max 2MB)
+                            </p>
+                          </div>
+                        </label>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-8">
+                  <User className="w-12 h-12 text-gray-300 mb-2" />
+                  <p className="text-sm text-gray-500 text-center">
+                    No information available
                   </p>
                 </div>
-
-                {/* Details Section */}
-                <div className="space-y-3 text-xs">
-                  <div className="bg-gray-50 p-2 rounded-lg">
-                    <p className="text-gray-500 mb-1">Account ID</p>
-                    <p className="font-semibold text-gray-900">
-                      {facultyInfo.accountId}
-                    </p>
-                  </div>
-
-                  <div className="bg-gray-50 p-2 rounded-lg">
-                    <p className="text-gray-500 mb-1">Email</p>
-                    <p className="font-medium text-gray-900 break-all">
-                      {facultyInfo.email}
-                    </p>
-                  </div>
-
-                  <div className="bg-gray-50 p-2 rounded-lg">
-                    <p className="text-gray-500 mb-1">Phone</p>
-                    <p className="font-medium text-gray-900">
-                      {facultyInfo.phone}
-                    </p>
-                  </div>
-
-                  {/* Signature Section */}
-                  <div className="bg-gray-50 p-2 rounded-lg">
-                    <p className="text-gray-500 mb-2">Digital Signature</p>
-                    {signaturePreview ? (
-                      <div className="space-y-2">
-                        <div className="bg-white border-2 border-gray-200 rounded-lg p-2 flex items-center justify-center">
-                          <img
-                            src={signaturePreview}
-                            alt="Signature"
-                            className="max-h-20 max-w-full object-contain"
-                          />
-                        </div>
-                        <div className="flex gap-2">
-                          <label className="flex-1 cursor-pointer">
-                            <input
-                              type="file"
-                              accept="image/*"
-                              onChange={handleSignatureUpload}
-                              className="hidden"
-                            />
-                            <div className="flex items-center justify-center gap-1 px-2 py-1 bg-blue-50 text-blue-600 rounded hover:bg-blue-100 transition-colors text-xs font-medium">
-                              <Upload className="w-3 h-3" />
-                              Change
-                            </div>
-                          </label>
-                          <button
-                            onClick={removeSignature}
-                            className="flex-1 flex items-center justify-center gap-1 px-2 py-1 bg-red-50 text-red-600 rounded hover:bg-red-100 transition-colors text-xs font-medium"
-                          >
-                            <X className="w-3 h-3" />
-                            Remove
-                          </button>
-                        </div>
-                      </div>
-                    ) : (
-                      <label className="cursor-pointer">
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleSignatureUpload}
-                          className="hidden"
-                        />
-                        <div className="flex flex-col items-center justify-center py-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-all">
-                          <Upload className="w-6 h-6 text-gray-400 mb-1" />
-                          <p className="text-xs text-gray-600 font-medium">
-                            Upload Signature
-                          </p>
-                          <p className="text-xs text-gray-400 mt-0.5">
-                            PNG, JPG (Max 2MB)
-                          </p>
-                        </div>
-                      </label>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center py-8">
-                <User className="w-12 h-12 text-gray-300 mb-2" />
-                <p className="text-sm text-gray-500 text-center">
-                  No information available
-                </p>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
             <div className="pt-4 mt-4 border-t border-gray-200">
               <button
                 onClick={handleLogout}
