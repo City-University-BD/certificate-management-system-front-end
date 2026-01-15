@@ -40,10 +40,9 @@ useEffect(() => {
       if (!userData) throw new Error("No user data found. Please login again.");
 
       const parsedData = JSON.parse(userData);
-      console.log(parsedData.studentData);
       
       // Use the correct path for _id
-      const id = parsedData?.studentData._id;
+      const id = parsedData?.studentId;
       if (!id) throw new Error("Student information not found");
 
       setStudentId(id);

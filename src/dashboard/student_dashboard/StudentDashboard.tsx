@@ -28,9 +28,10 @@ const StudentDashboard = () => {
 
       try {
         const parsedData = JSON.parse(userData);
+        console.log(parsedData);
 
-        if (parsedData.studentData && parsedData.studentData._id) {
-          const id = parsedData.studentData._id;
+        if (parsedData && parsedData._id) {
+          const id = parsedData._id;
 
           // Fetch student profile from API
           const res = await fetch(
