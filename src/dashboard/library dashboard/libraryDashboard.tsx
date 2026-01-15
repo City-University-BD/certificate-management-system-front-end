@@ -6,7 +6,7 @@ interface FacultyData {
   _id: string;
   name: string;
   email: string;
-  facultyId: string;
+ libraryId : string;
   phone: string;
   image: string;
   role: number;
@@ -192,18 +192,12 @@ const LibraryDashboard = () => {
                 {/* Details Section */}
                 <div className="space-y-3 text-xs">
                   <div className="bg-gray-50 p-2 rounded-lg">
-                    <p className="text-gray-500 mb-1">Faculty ID</p>
+                    <p className="text-gray-500 mb-1">Library ID</p>
                     <p className="font-semibold text-gray-900">
-                      {facultyInfo.facultyId}
+                      {facultyInfo.libraryId}
                     </p>
                   </div>
 
-                  <div className="bg-gray-50 p-2 rounded-lg">
-                    <p className="text-gray-500 mb-1">Department</p>
-                    <p className="font-semibold text-gray-900 uppercase">
-                      {facultyInfo.department}
-                    </p>
-                  </div>
 
                   <div className="bg-gray-50 p-2 rounded-lg">
                     <p className="text-gray-500 mb-1">Email</p>

@@ -6,7 +6,7 @@ interface FacultyData {
   _id: string;
   name: string;
   email: string;
-  libraryId: string;
+  facultyId: string;
   phone: string;
   image: string;
   role: number;
@@ -198,7 +198,7 @@ const FacultyDashboard = ({ dashboard, url }: FacultyDashboardProps) => {
                   <div className="bg-gray-50 p-2 rounded-lg">
                     <p className="text-gray-500 mb-1">Library ID</p>
                     <p className="font-semibold text-gray-900">
-                      {facultyInfo.libraryId}
+                      {facultyInfo.facultyId}
                     </p>
                   </div>
 

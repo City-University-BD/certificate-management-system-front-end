@@ -447,41 +447,6 @@ useEffect(() => {
                 </p>
               )}
             </div>
-            {/* Profile Image Field */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-600 flex items-center gap-2">
-                Profile Image
-              </label>
-
-              {isEditing ? (
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (!file) return; // safe check
-
-                    setStudentData({
-                      ...studentData,
-                      image: file,
-                    });
-                  }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              ) : (
-                <div className="flex items-center gap-3">
-                  {studentData.image ? (
-                    <img
-                      src={getImageSrc(studentData.image)}
-                      alt="Profile"
-                      className="w-20 h-20 rounded-lg object-cover border"
-                    />
-                  ) : (
-                    <p className="text-gray-500 text-sm">No image uploaded</p>
-                  )}
-                </div>
-              )}
-            </div>
 
             {/* Signature Field */}
             <div className="space-y-2">
@@ -506,9 +471,9 @@ useEffect(() => {
                 />
               ) : (
                 <div className="flex items-center gap-3">
-                  {studentData.signature ? (
+                  {studentData?.signature ? (
                     <img
-                      src={getImageSrc(studentData.signature)}
+                      src={getImageSrc(studentData?.signature)}
                       alt="Signature"
                       className="h-16 object-contain border p-2 rounded-lg bg-white"
                     />
