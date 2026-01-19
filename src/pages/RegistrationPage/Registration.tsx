@@ -340,7 +340,7 @@ const Registration: React.FC = () => {
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="email">Email Address *</Label>
+              <Label htmlFor="email">Email Address*</Label>
               <Input
                 id="email"
                 name="email"
