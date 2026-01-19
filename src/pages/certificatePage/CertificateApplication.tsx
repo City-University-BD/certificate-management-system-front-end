@@ -31,6 +31,7 @@ interface FormData {
   passingYear: string;
   sscCertificate: File | null;
   hscCertificate: File | null;
+   signature: File | null;
   applicationType: number;
   remarks: string;
 }
@@ -52,6 +53,7 @@ interface FormErrors {
   passingYear?: string;
   sscCertificate?: string;
   hscCertificate?: string;
+  signature?: string;
   applicationType?: string;
   general?: string;
 }
@@ -86,6 +88,7 @@ const CertificateApplicationForm: React.FC = () => {
     sscCertificate: null,
     hscCertificate: null,
     applicationType: 0,
+    signature: null,
     remarks: "",
   });
 
@@ -95,6 +98,8 @@ const CertificateApplicationForm: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState<string>("");
   const [applicationId, setApplicationID] = useState<string>("");
   const [resubmit, setResubmit] = useState<number>(0);
+  const [existingSignature, setExistingSignature] = useState<string | null>(null);
+
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 50 }, (_, i) => currentYear - i);
 
@@ -118,9 +123,10 @@ const CertificateApplicationForm: React.FC = () => {
 
         // Parse the JSON data
         const parsedData = JSON.parse(userData);
+        console.log(parsedData);
 
         // Check if student data exists
-        if (!parsedData.studentData) {
+        if (!parsedData) {
           setErrors({
             general: "Student information not found",
           });
@@ -133,12 +139,13 @@ const CertificateApplicationForm: React.FC = () => {
         //       // Pre-fill the form with student data
         setFormData((prev) => ({
           ...prev,
-          studentId: parsedData.studentData.studentId || "",
-          studentName: parsedData.studentData.name || "",
-          email: parsedData.studentData.email || "",
-          program: parsedData.studentData.department || "",
-          department: parsedData.studentData.department || "",
-          departmentId: parsedData.studentData.departmentId || "",
+          studentId: parsedData.studentId || "",
+          studentName: parsedData.name || "",
+          email: parsedData.email || "",
+          program: parsedData.department || "",
+          department: parsedData.department || "",
+          departmentId: parsedData.departmentId || "",
+          signature: parsedData.signature || null
         }));
       } catch (err) {
         console.error("Error fetching student data:", err);
@@ -152,6 +159,16 @@ const CertificateApplicationForm: React.FC = () => {
 
     fetchStudentData();
   }, []);
+
+
+  useEffect(() => {
+  const userData = localStorage.getItem("userData");
+  if (!userData) return;
+
+  const parsed = JSON.parse(userData);
+  setExistingSignature(parsed?.signature || null);
+}, []);
+
 
   useEffect(() => {
     const fetchStudentData = async () => {
@@ -180,9 +197,9 @@ const CertificateApplicationForm: React.FC = () => {
         }
 
         const studentId = parsedData?.studentId;
+     
 
         const isApplied = parsedData?.isApplied;
-        console.log(isApplied);
 
         if (isApplied === true) {
           // Fetch application data from API
@@ -263,6 +280,10 @@ const CertificateApplicationForm: React.FC = () => {
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
+
+     if (!existingSignature && !formData.signature) {
+    newErrors.signature = "Signature is required";
+  }
 
     if (!formData.studentId.trim())
       newErrors.studentId = "Student ID is required";
@@ -386,9 +407,9 @@ const CertificateApplicationForm: React.FC = () => {
           const userData = localStorage.getItem("userData");
           if (userData) {
             const parsedData = JSON.parse(userData);
-            if (parsedData.studentData) {
+            if (parsedData) {
               // Update the isApplied field to true
-              parsedData.studentData.isApplied = true;
+              parsedData.isApplied = true;
               // Save back to localStorage
               localStorage.setItem("userData", JSON.stringify(parsedData));
               console.log("Updated isApplied to true in localStorage");
@@ -425,12 +446,12 @@ const CertificateApplicationForm: React.FC = () => {
         if (hscInput) hscInput.value = "";
 
         // // Optionally redirect after success
-        // setTimeout(() => {
-        //   window.location.href = "/student-dashboard/status";
-        // }, 2000);
         setTimeout(() => {
-          window.location.href = "/student-dashboard/payment";
+          window.location.href = "/student-dashboard/status";
         }, 2000);
+        // setTimeout(() => {
+        //   window.location.href = "/student-dashboard/payment";
+        // }, 2000);
       } else {
         let errorMessage = "Application failed. Please try again.";
 
@@ -554,9 +575,9 @@ const CertificateApplicationForm: React.FC = () => {
 
           if (userData) {
             const parsedData = JSON.parse(userData!);
-            if (parsedData.studentData) {
+            if (parsedData) {
               // Update the isApplied field to true
-              parsedData.studentData.isApplied = true;
+              parsedData.isApplied = true;
               // Save back to localStorage
               localStorage.setItem("userData", JSON.stringify(parsedData));
               console.log("Updated isApplied to true in localStorage");
@@ -1039,6 +1060,12 @@ const CertificateApplicationForm: React.FC = () => {
               </div>
 
               <div className="grid gap-2">
+ <div>
+  
+ </div>
+
+                <div>
+                  
                 <Label htmlFor="remarks">Remarks (Optional)</Label>
                 <textarea
                   id="remarks"
@@ -1049,6 +1076,7 @@ const CertificateApplicationForm: React.FC = () => {
                   className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                   rows={3}
                 />
+                </div>
               </div>
             </div>
           </CardContent>

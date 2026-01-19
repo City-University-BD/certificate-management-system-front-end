@@ -5,6 +5,7 @@ interface ClearanceItem {
   status?: number;
   date: string | null;
   message: string;
+  signature: string;
 }
 
 interface ApplicationData {
@@ -14,6 +15,7 @@ interface ApplicationData {
   program: string;
   department?: string;
   batch: string;
+  signature: string;
   creditCompleted: number;
   creditWaived: number;
   campus: string;
@@ -37,9 +39,7 @@ interface ApplicationData {
     accounts: ClearanceItem;
     library: ClearanceItem;
     examController: ClearanceItem;
-    administrator: ClearanceItem;
-    hod: ClearanceItem;
-    controller: ClearanceItem;
+    registrar: ClearanceItem;
   };
 }
 
@@ -73,12 +73,9 @@ const DownloadDetails = () => {
       }
     };
 
-    if (id) {
-      fetchApplicationDetails();
-    }
+    if (id) fetchApplicationDetails();
   }, [id]);
 
-  // Format date for display
   const formatDate = (dateString: string | null) => {
     if (!dateString) return "";
     const date = new Date(dateString);
@@ -93,29 +90,27 @@ const DownloadDetails = () => {
     );
   }
 
+  // Reusable Checkbox component
+  const CheckBox = ({ checked }: { checked: boolean }) => (
+    <div
+      className={`w-4 h-4 border-2 border-gray-800 mr-2 mt-0.5 flex items-center justify-center ${
+        checked ? "bg-gray-800" : ""
+      }`}
+    >
+      {checked && <span className="text-white text-xs">✓</span>}
+    </div>
+  );
+
   return (
     <>
       <style>{`
         @media print {
-          body {
-            margin: 0;
-            padding: 0px;
-          }
-          .no-print {
-            display: none !important;
-          }
-          .print-container {
-            max-width: 100% !important;
-            margin: 0 !important;
-            padding: 0px !important;
-          }
+          body { margin: 0; padding: 0px; }
+          .no-print { display: none !important; }
+          .print-container { max-width: 100% !important; margin: 0 !important; padding: 0px !important; }
         }
-        
         @media screen {
-          .print-container {
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
-            background: white;
-          }
+          .print-container { box-shadow: 0 0 20px rgba(0,0,0,0.1); background: white; }
         }
       `}</style>
 
@@ -124,7 +119,7 @@ const DownloadDetails = () => {
           {/* Header */}
           <div className="flex items-center mb-1 border-b-4 border-gray-800 pb-6">
             <div className="flex-shrink-0">
-              <div className="h-24 w-24  rounded-full flex items-center justify-center text-gray-500 text-xs">
+              <div className="h-24 w-24 rounded-full flex items-center justify-center text-gray-500 text-xs">
                 <img src="/logo_all.png" alt="City University Logo" />
               </div>
             </div>
@@ -141,48 +136,30 @@ const DownloadDetails = () => {
             </div>
           </div>
 
-          {/* Student Information Section */}
+          {/* Student Information */}
           <div className="mb-8">
             <h3 className="text-lg font-semibold mb-2 bg-gray-800 text-white px-4 py-2">
               Student Information
             </h3>
 
             <div className="grid grid-cols-2 gap-4 mb-4">
-              {/* Batch */}
               <div className="border border-gray-300 p-3">
-                <label className="text-sm font-semibold text-gray-600">
-                  Batch:
-                </label>
-                <div className="text-base font-medium mt-1">
-                  {application.batch}
-                </div>
+                <label className="text-sm font-semibold text-gray-600">Batch:</label>
+                <div className="text-base font-medium mt-1">{application.batch}</div>
               </div>
-              {/* Student ID */}
               <div className="border border-gray-300 p-3">
-                <label className="text-sm font-semibold text-gray-600">
-                  Student ID:
-                </label>
-                <div className="text-base font-medium mt-1">
-                  {application.studentId}
-                </div>
+                <label className="text-sm font-semibold text-gray-600">Student ID:</label>
+                <div className="text-base font-medium mt-1">{application.studentId}</div>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4 mb-4">
-              {/* Student Name */}
               <div className="border border-gray-300 p-3">
-                <label className="text-sm font-semibold text-gray-600">
-                  Student Name
-                </label>
-                <div className="text-base font-medium mt-1">
-                  {application.studentName}
-                </div>
+                <label className="text-sm font-semibold text-gray-600">Student Name</label>
+                <div className="text-base font-medium mt-1">{application.studentName}</div>
               </div>
-              {/* Date of Birth */}
               <div className="border border-gray-300 p-3">
-                <label className="text-sm font-semibold text-gray-600">
-                  Date of Birth
-                </label>
+                <label className="text-sm font-semibold text-gray-600">Date of Birth</label>
                 <div className="text-base font-medium mt-1">
                   {formatDate(application.dateOfBirth)}
                 </div>
@@ -190,62 +167,32 @@ const DownloadDetails = () => {
             </div>
 
             <div className="grid grid-cols-3 gap-4 mb-4">
-              {/* Credit Completed */}
               <div className="border border-gray-300 p-3">
-                <label className="text-sm font-semibold text-gray-600">
-                  Credit Completed
-                </label>
-                <div className="text-base font-medium mt-1">
-                  {application.creditCompleted}
-                </div>
+                <label className="text-sm font-semibold text-gray-600">Credit Completed</label>
+                <div className="text-base font-medium mt-1">{application.creditCompleted}</div>
               </div>
-              {/* Credit Waived/Transferred */}
               <div className="border border-gray-300 p-3">
-                <label className="text-sm font-semibold text-gray-600">
-                  Credit Waived/Transferred
-                </label>
-                <div className="text-base font-medium mt-1">
-                  {application.creditWaived}
-                </div>
+                <label className="text-sm font-semibold text-gray-600">Credit Waived/Transferred</label>
+                <div className="text-base font-medium mt-1">{application.creditWaived}</div>
               </div>
-              {/* Major */}
               <div className="border border-gray-300 p-3">
-                <label className="text-sm font-semibold text-gray-600">
-                  Major
-                </label>
-                <div className="text-base font-medium mt-1">
-                  {application.program}
-                </div>
+                <label className="text-sm font-semibold text-gray-600">Major</label>
+                <div className="text-base font-medium mt-1">{application.program}</div>
               </div>
             </div>
 
             <div className="grid grid-cols-3 gap-4 mb-4">
-              {/* Campus Name */}
               <div className="border border-gray-300 p-3">
-                <label className="text-sm font-semibold text-gray-600">
-                  Campus Name
-                </label>
-                <div className="text-base font-medium mt-1">
-                  {application.campus}
-                </div>
+                <label className="text-sm font-semibold text-gray-600">Campus Name</label>
+                <div className="text-base font-medium mt-1">{application.campus}</div>
               </div>
-              {/* Mobile Number */}
               <div className="border border-gray-300 p-3">
-                <label className="text-sm font-semibold text-gray-600">
-                  Mobile Number
-                </label>
-                <div className="text-base font-medium mt-1">
-                  {application.mobile}
-                </div>
+                <label className="text-sm font-semibold text-gray-600">Mobile Number</label>
+                <div className="text-base font-medium mt-1">{application.mobile}</div>
               </div>
-              {/* Email */}
               <div className="border border-gray-300 p-3">
-                <label className="text-sm font-semibold text-gray-600">
-                  Email
-                </label>
-                <div className="text-base font-medium mt-1">
-                  {application.email}
-                </div>
+                <label className="text-sm font-semibold text-gray-600">Email</label>
+                <div className="text-base font-medium mt-1">{application.email}</div>
               </div>
             </div>
           </div>
@@ -257,20 +204,12 @@ const DownloadDetails = () => {
             </p>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-semibold text-gray-600">
-                  Last Semester
-                </label>
-                <div className="text-base font-medium mt-1">
-                  {application.lastSemester}
-                </div>
+                <label className="text-sm font-semibold text-gray-600">Last Semester</label>
+                <div className="text-base font-medium mt-1">{application.lastSemester}</div>
               </div>
               <div>
-                <label className="text-sm font-semibold text-gray-600">
-                  Passing Year
-                </label>
-                <div className="text-base font-medium mt-1">
-                  {application.passingYear}
-                </div>
+                <label className="text-sm font-semibold text-gray-600">Passing Year</label>
+                <div className="text-base font-medium mt-1">{application.passingYear}</div>
               </div>
             </div>
           </div>
@@ -282,38 +221,20 @@ const DownloadDetails = () => {
             </p>
             <div className="space-y-2">
               <div className="flex items-center">
-                <div
-                  className={`w-4 h-4 border-2 border-gray-800 mr-2 flex items-center justify-center ${
-                    application.applicationType === 0 ? "bg-gray-800" : ""
-                  }`}
-                >
-                  {application.applicationType === 0 && (
-                    <span className="text-white text-xs">✓</span>
-                  )}
+                <div className={`w-4 h-4 border-2 border-gray-800 mr-2 flex items-center justify-center ${application.applicationType === 0 ? "bg-gray-800" : ""}`}>
+                  {application.applicationType === 0 && <span className="text-white text-xs">✓</span>}
                 </div>
                 <label className="text-sm">Transcript</label>
               </div>
               <div className="flex items-center">
-                <div
-                  className={`w-4 h-4 border-2 border-gray-800 mr-2 flex items-center justify-center ${
-                    application.applicationType === 1 ? "bg-gray-800" : ""
-                  }`}
-                >
-                  {application.applicationType === 1 && (
-                    <span className="text-white text-xs">✓</span>
-                  )}
+                <div className={`w-4 h-4 border-2 border-gray-800 mr-2 flex items-center justify-center ${application.applicationType === 1 ? "bg-gray-800" : ""}`}>
+                  {application.applicationType === 1 && <span className="text-white text-xs">✓</span>}
                 </div>
                 <label className="text-sm">Provisional Certificate</label>
               </div>
               <div className="flex items-center">
-                <div
-                  className={`w-4 h-4 border-2 border-gray-800 mr-2 flex items-center justify-center ${
-                    application.applicationType === 2 ? "bg-gray-800" : ""
-                  }`}
-                >
-                  {application.applicationType === 2 && (
-                    <span className="text-white text-xs">✓</span>
-                  )}
+                <div className={`w-4 h-4 border-2 border-gray-800 mr-2 flex items-center justify-center ${application.applicationType === 2 ? "bg-gray-800" : ""}`}>
+                  {application.applicationType === 2 && <span className="text-white text-xs">✓</span>}
                 </div>
                 <label className="text-sm">Incomplete Transcript</label>
               </div>
@@ -328,208 +249,92 @@ const DownloadDetails = () => {
             <table className="w-full border-collapse border-2 border-gray-800">
               <thead>
                 <tr className="bg-gray-200">
-                  <th className="border-2 border-gray-800 p-3 text-left font-semibold w-1/4">
-                    Office
-                  </th>
-                  <th className="border-2 border-gray-800 p-3 text-left font-semibold">
-                    Status
-                  </th>
-                  <th className="border-2 border-gray-800 p-3 text-left font-semibold w-1/3">
-                    Seal & Signature
-                  </th>
+                  <th className="border-2 border-gray-800 p-3 text-left font-semibold w-1/4">Office</th>
+                  <th className="border-2 border-gray-800 p-3 text-left font-semibold">Status</th>
+                  <th className="border-2 border-gray-800 p-3 text-left font-semibold w-1/3">Seal & Signature</th>
                 </tr>
               </thead>
               <tbody>
-                {/* Faculty Use Only */}
+                {/* Faculty */}
                 <tr>
-                  <td className="border-2 border-gray-800 p-4 align-top font-medium">
-                    Faculty
-                  </td>
+                  <td className="border-2 border-gray-800 p-4 align-top font-medium">Faculty</td>
                   <td className="border-2 border-gray-800 p-4 align-top">
                     <div className="space-y-2">
                       <div className="flex items-start">
-                        <div className="w-4 h-4 border-2 border-gray-800 mr-2 mt-0.5"></div>
-                        <label className="text-sm">
-                          Applicant has completed all requirements for
-                          graduation
-                        </label>
+                        <CheckBox checked={application.clearance.faculty.status === 1} />
+                        <label className="text-sm">Applicant has completed all requirements for graduation</label>
                       </div>
                       <div className="flex items-start">
-                        <div className="w-4 h-4 border-2 border-gray-800 mr-2 mt-0.5"></div>
-                        <label className="text-sm">
-                          Applicant has not completed all requirements for
-                          graduation
-                        </label>
+                        <CheckBox checked={application.clearance.faculty.status === 0} />
+                        <label className="text-sm">Applicant has not completed all requirements for graduation</label>
                       </div>
                     </div>
                   </td>
-
                   <td className="border-2 border-gray-800 p-4 align-top">
-                    <div className="h-20">
-                      <img
-                        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTmFvhzGt57tLPmeVbJ-v848K76u6GD2yQhpQ&s"
-                        alt=""
-                        className="w-full h-full object-contain"
-                      />
+                    <div className="h-20 border-b-2 border-gray-800">
+                      <img src={application?.clearance?.faculty?.signature} alt="" className="w-full h-full object-contain" />
                     </div>
-                    <p className="text-xs text-gray-600 italic mt-2 text-center">
-                      Head of Department{" "}
-                    </p>
+                    <p className="text-xs text-gray-600 italic mt-2 text-center">Head of Department</p>
                   </td>
                 </tr>
 
-                {/* Library Use Only */}
+                {/* Library */}
                 <tr>
-                  <td className="border-2 border-gray-800 p-4 align-top font-medium">
-                    Library
-                  </td>
+                  <td className="border-2 border-gray-800 p-4 align-top font-medium">Library</td>
                   <td className="border-2 border-gray-800 p-4 align-top">
                     <div className="space-y-2">
                       <div className="flex items-start">
-                        <div className="w-4 h-4 border-2 border-gray-800 mr-2 mt-0.5"></div>
-                        <label className="text-sm">
-                          Applicant has returned library card
-                        </label>
+                        <CheckBox checked={application.clearance.library.status === 1} />
+                        <label className="text-sm">Applicant has returned library card</label>
                       </div>
                       <div className="flex items-start">
-                        <div className="w-4 h-4 border-2 border-gray-800 mr-2 mt-0.5"></div>
-                        <label className="text-sm">
-                          Applicant has not returned library card
-                        </label>
+                        <CheckBox checked={application.clearance.library.status === 0} />
+                        <label className="text-sm">Applicant has not returned library card</label>
                       </div>
                     </div>
                   </td>
-
                   <td className="border-2 border-gray-800 p-4 align-top">
-                    <div className="h-20">
-                      <img
-                        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTmFvhzGt57tLPmeVbJ-v848K76u6GD2yQhpQ&s"
-                        alt=""
-                        className="w-full h-full object-contain"
-                      />
+                    <div className="h-20 border-b-2 border-gray-800">
+                      <img src={application?.clearance?.library?.signature} alt="" className="w-full h-full object-contain" />
                     </div>
-                    <p className="text-xs text-gray-600 italic mt-2 text-center">
-                      Library In-charge
-                    </p>
+                    <p className="text-xs text-gray-600 italic mt-2 text-center">Library In-charge</p>
                   </td>
                 </tr>
 
-                {/* Accounts Use Only */}
+                {/* Accounts */}
                 <tr>
-                  <td className="border-2 border-gray-800 p-4 align-top font-medium">
-                    Accounts
-                  </td>
+                  <td className="border-2 border-gray-800 p-4 align-top font-medium">Accounts</td>
                   <td className="border-2 border-gray-800 p-4 align-top">
                     <div className="space-y-2">
-                      <div className="flex items-start">
-                        <div className="w-4 h-4 border-2 border-gray-800 mr-2 mt-0.5"></div>
-                        <label className="text-sm">All dues cleared</label>
-                      </div>
-                      <div className="flex items-start">
-                        <div className="w-4 h-4 border-2 border-gray-800 mr-2 mt-0.5"></div>
-                        <label className="text-sm">Dues pending</label>
-                      </div>
-                      <div className="flex items-start">
-                        <div className="w-4 h-4 border-2 border-gray-800 mr-2 mt-0.5"></div>
-                        <label className="text-sm">Received Taka 500</label>
-                      </div>
-                      <div className="flex items-start">
-                        <div className="w-4 h-4 border-2 border-gray-800 mr-2 mt-0.5"></div>
-                        <label className="text-sm">Received Taka 1000</label>
-                      </div>
-                      <div className="flex items-start">
-                        <div className="w-4 h-4 border-2 border-gray-800 mr-2 mt-0.5"></div>
-                        <label className="text-sm">Hall clearance</label>
-                      </div>
+                      <div className="flex items-start"><CheckBox checked={application.clearance.accounts.status === 1} /><label className="text-sm">All dues cleared</label></div>
+                      <div className="flex items-start"><CheckBox checked={application.clearance.accounts.status === 2} /><label className="text-sm">Dues pending</label></div>
+                      <div className="flex items-start"><CheckBox checked={application.clearance.accounts.status === 3} /><label className="text-sm">Received Taka 500</label></div>
+                      <div className="flex items-start"><CheckBox checked={application.clearance.accounts.status === 4} /><label className="text-sm">Received Taka 1000</label></div>
+                      <div className="flex items-start"><CheckBox checked={application.clearance.accounts.status === 5} /><label className="text-sm">Hall clearance</label></div>
                     </div>
                   </td>
                   <td className="border-2 border-gray-800 p-4 align-top">
-                    <div className="h-20">
-                      <img
-                        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTmFvhzGt57tLPmeVbJ-v848K76u6GD2yQhpQ&s"
-                        alt=""
-                        className="w-full h-full object-contain"
-                      />
+                    <div className="h-20 border-b-2 border-gray-800">
+                      <img src={application?.clearance?.accounts?.signature} alt="" className="w-full h-full object-contain" />
                     </div>
-                    <p className="text-xs text-gray-600 italic mt-2 text-center">
-                      Accounts Officer
-                    </p>
+                    <p className="text-xs text-gray-600 italic mt-2 text-center">Accounts Officer</p>
                   </td>
                 </tr>
 
-                {/* Registrar Office */}
+                {/* Registrar */}
                 <tr>
-                  <td className="border-2 border-gray-800 p-4 align-top font-medium">
-                    Registrar Office
-                  </td>
+                  <td className="border-2 border-gray-800 p-4 align-top font-medium">Registrar Office</td>
                   <td className="border-2 border-gray-800 p-4 align-top">
                     <div className="space-y-2">
-                      <div className="flex items-start">
-                        <div className="w-4 h-4 border-2 border-gray-800 mr-2 mt-0.5"></div>
-                        <label className="text-sm">
-                          Applicant has completed all requirements for
-                          graduation
-                        </label>
-                      </div>
-                      <div className="flex items-start">
-                        <div className="w-4 h-4 border-2 border-gray-800 mr-2 mt-0.5"></div>
-                        <label className="text-sm">
-                          Applicant has not completed all requirements for
-                          graduation
-                        </label>
-                      </div>
+                      <div className="flex items-start"><CheckBox checked={application.clearance.registrar.status === 1} /><label className="text-sm">Applicant has completed all requirements for graduation</label></div>
+                      <div className="flex items-start"><CheckBox checked={application.clearance.registrar.status === 0} /><label className="text-sm">Applicant has not completed all requirements for graduation</label></div>
                     </div>
-                  </td>
-
-                  <td className="border-2 border-gray-800 p-4 align-top">
-                    <div className="h-20">
-                      <img
-                        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTmFvhzGt57tLPmeVbJ-v848K76u6GD2yQhpQ&s"
-                        alt=""
-                        className="w-full h-full object-contain"
-                      />
-                    </div>
-                    <p className="text-xs text-gray-600 italic mt-2 text-center">
-                      Registrar{" "}
-                    </p>
-                  </td>
-                </tr>
-
-                {/* Controller Office */}
-                <tr>
-                  <td className="border-2 border-gray-800 p-4 align-top font-medium">
-                    Controller Office
                   </td>
                   <td className="border-2 border-gray-800 p-4 align-top">
-                    <div className="space-y-2">
-                      <div className="flex items-start">
-                        <div className="w-4 h-4 border-2 border-gray-800 mr-2 mt-0.5"></div>
-                        <label className="text-sm">
-                          Applicant has completed all requirements for
-                          graduation
-                        </label>
-                      </div>
-                      <div className="flex items-start">
-                        <div className="w-4 h-4 border-2 border-gray-800 mr-2 mt-0.5"></div>
-                        <label className="text-sm">
-                          Applicant has not completed all requirements for
-                          graduation
-                        </label>
-                      </div>
+                    <div className="h-20 border-b-2 border-gray-800">
+                      <img src={application?.clearance?.registrar?.signature} alt="" className="w-full h-full object-contain" />
                     </div>
-                  </td>
-
-                  <td className="border-2 border-gray-800 p-4 align-top">
-                    <div className="h-20">
-                      <img
-                        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTmFvhzGt57tLPmeVbJ-v848K76u6GD2yQhpQ&s"
-                        alt=""
-                        className="w-full h-full object-contain"
-                      />
-                    </div>
-                    <p className="text-xs text-gray-600 italic mt-2 text-center">
-                      Controller of Examinations{" "}
-                    </p>
+                    <p className="text-xs text-gray-600 italic mt-2 text-center">Registrar</p>
                   </td>
                 </tr>
               </tbody>
@@ -539,8 +344,7 @@ const DownloadDetails = () => {
           {/* Important Note */}
           <div className="mb-6 bg-yellow-50 border-l-4 border-yellow-400 p-4">
             <p className="text-sm font-medium text-gray-800">
-              <strong>Important:</strong> Before submission of this form, please
-              return the ID card and Library card
+              <strong>Important:</strong> Before submission of this form, please return the ID card and Library card
             </p>
           </div>
 
@@ -548,13 +352,22 @@ const DownloadDetails = () => {
           <div className="mb-8 border-t-2 border-gray-300 pt-4">
             <div className="flex justify-between items-end">
               <div>
-                <div className="border-t-2 border-gray-800 w-64 mt-12 pt-2">
-                  <p className="text-sm text-center">Student Signature</p>
+                <div className="border-b-2 border-gray-800 w-64 mt-12 pt-2">
+                  <img src={application?.signature} alt="" />
                 </div>
+                <p className="text-sm text-center">Student Signature</p>
               </div>
               <div>
-                <div className="border-t-2 border-gray-800 w-48 mt-12 pt-2">
-                  <p className="text-sm text-center">Date</p>
+                <div className=" w-48 mt-12 pt-2">
+                 <h2 className="border-b-2 text-center border-gray-800">
+  {new Date(application.createdAt).toLocaleString("en-GB", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric"
+  })}
+</h2>
+
+                   <p className="text-sm text-center">Date</p>
                 </div>
               </div>
             </div>
@@ -562,14 +375,11 @@ const DownloadDetails = () => {
 
           {/* Footer */}
           <div className="mt-8 text-center text-xs text-gray-500 border-t pt-4">
-            <p>
-              This is an official document. Any alteration or forgery is
-              punishable by law.
-            </p>
+            <p>This is an official document. Any alteration or forgery is punishable by law.</p>
           </div>
         </div>
 
-        {/* Print Button - Hidden when printing */}
+        {/* Print Button */}
         <div className="no-print text-center mt-6">
           <button
             onClick={() => window.print()}

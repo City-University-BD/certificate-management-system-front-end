@@ -33,39 +33,64 @@ const Login: React.FC = () => {
     role: "",
   });
 
-  const Spinner = () => (
-  <svg
-    className="h-4 w-4 animate-spin"
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-  >
-    <circle
-      className="opacity-25"
-      cx="12"
-      cy="12"
-      r="10"
-      stroke="currentColor"
-      strokeWidth="4"
-    />
-    <path
-      className="opacity-75"
-      fill="currentColor"
-      d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-    />
-  </svg>
-);
-
-  
   const [errors, setErrors] = useState<LoginErrors>({});
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [successMessage, setSuccessMessage] = useState<string>("");
-  const [showPassword, setShowPassword] = useState<boolean>(false); // Password toggle
+  const [isLoading, setIsLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
   const navigate = useNavigate();
 
-  // Function to get the dashboard route based on role
+  /* ================= ROLE WISE DEMO CREDENTIALS ================= */
+  const roleCredentials: Record<string, { email: string; password: string }> = {
+    "exam-controller": {
+      email: "examcsece@gmail.com",
+      password: "123456",
+    },
+    faculty: {
+      email: "facultycse@gmail.com",
+      password: "123456",
+    },
+    library: {
+      email: "library@gmail.com",
+      password: "123456",
+    },
+    account: {
+      email: "account@gmail.com",
+      password: "123456",
+    },
+    registrar: {
+      email: "registrar@gmail.com",
+      password: "123456",
+    },
+  };
+
+  /* ================= Spinner ================= */
+  const Spinner = () => (
+    <svg
+      className="h-4 w-4 animate-spin"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+    >
+      <circle
+        className="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        strokeWidth="4"
+      />
+      <path
+        className="opacity-75"
+        fill="currentColor"
+        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+      />
+    </svg>
+  );
+
+  /* ================= Dashboard route ================= */
   const getDashboardRoute = (role: string): string => {
-    const roleRoutes: { [key: string]: string } = {
+    const roleRoutes: Record<string, string> = {
       account: "/accounts-dashboard",
       registrar: "/registrar-dashboard",
       faculty: "/faculty-dashboard",
@@ -76,115 +101,90 @@ const Login: React.FC = () => {
     return roleRoutes[role] || "/dashboard";
   };
 
+  /* ================= Input Change ================= */
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
+
+    // ✅ Role select করলে auto email/password বসবে
+    if (name === "role") {
+      const creds = roleCredentials[value];
+
+      setLoginData((prev) => ({
+        ...prev,
+        role: value,
+        email: creds ? creds.email : "",
+        password: creds ? creds.password : "",
+      }));
+
+      setErrors({});
+      return;
+    }
+
     setLoginData((prev) => ({
       ...prev,
       [name]: value,
     }));
-    // Clear specific error when user starts typing
-    if (errors[name as keyof LoginErrors]) {
-      setErrors((prev) => ({
-        ...prev,
-        [name]: "",
-      }));
-    }
   };
 
-  const validateForm = (): boolean => {
+  /* ================= Validation ================= */
+  const validateForm = () => {
     const newErrors: LoginErrors = {};
 
-    if (!loginData.email.trim()) {
-      newErrors.email = "Email is required";
-    } else {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(loginData.email)) {
-        newErrors.email = "Please enter a valid email address";
-      }
-    }
-
-    if (!loginData.password.trim()) {
-      newErrors.password = "Password is required";
-    }
-
-    if (!loginData.role) {
-      newErrors.role = "Please select a role";
-    }
+    if (!loginData.email) newErrors.email = "Email is required";
+    if (!loginData.password) newErrors.password = "Password is required";
+    if (!loginData.role) newErrors.role = "Please select a role";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
+  /* ================= Submit ================= */
   const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-
     if (!validateForm()) return;
 
     setIsLoading(true);
-    setErrors({});
     setSuccessMessage("");
 
     try {
-      const submitData = {
-        email: loginData.email.trim().toLowerCase(),
-        password: loginData.password,
-      };
-
-      const response = await fetch(
+      const res = await fetch(
         `https://server-side-rho-snowy.vercel.app/${loginData.role}/login`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(submitData),
+          body: JSON.stringify({
+            email: loginData.email.toLowerCase(),
+            password: loginData.password,
+          }),
         }
       );
 
-      const result = await response.json();
+      const result = await res.json();
 
-      if (response.ok) {
+      if (res.ok) {
         setSuccessMessage("Login successful! Redirecting...");
 
         if (result?.data) {
-            console.log(result?.data);
-          localStorage.setItem("signature", result?.data?.user?.signature);
-          localStorage.setItem("authToken", result?.data?.token);
-         localStorage.setItem("userData", JSON.stringify(result?.data?.user));
+          localStorage.setItem("authToken", result.data.token);
+          localStorage.setItem(
+            "userData",
+            JSON.stringify(result.data.user)
+          );
+          localStorage.setItem("signature", result.data.user.signature);
         }
-        
-        // Store the user role
+
         localStorage.setItem("userRole", loginData.role);
 
-        // Get the appropriate dashboard route based on role
-        const dashboardRoute = getDashboardRoute(loginData.role);
-
-        // Clear form
-        setLoginData({ email: "", password: "", role: "" });
-
-        // Navigate to role-specific dashboard
         setTimeout(() => {
-          navigate(dashboardRoute);
+          navigate(getDashboardRoute(loginData.role));
         }, 1000);
       } else {
-        if (result.errors) {
-          const serverErrors: LoginErrors = {};
-          result.errors.forEach((error: any) => {
-            serverErrors[error.field as keyof LoginErrors] = error.message;
-          });
-          setErrors(serverErrors);
-        } else {
-          setErrors({
-            general:
-              result.message || "Login failed. Please check your credentials.",
-          });
-        }
+        setErrors({ general: result.message || "Login failed" });
       }
-    } catch (error) {
-      console.error("Login error:", error);
-      setErrors({
-        general: "Network error. Please check your connection and try again.",
-      });
+    } catch {
+      setErrors({ general: "Network error" });
     } finally {
       setIsLoading(false);
     }
@@ -193,7 +193,8 @@ const Login: React.FC = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="w-full max-w-sm space-y-6">
-        {/* System Heading */}
+
+        {/* ======= ORIGINAL LOGO & HEADING (UNCHANGED) ======= */}
         <div className="text-center">
           <div className="flex items-center justify-center mb-4">
             <img src="/logo_all.png" alt="City University Logo" />
@@ -206,132 +207,83 @@ const Login: React.FC = () => {
           </p>
         </div>
 
-        <Card className="w-full">
+        <Card>
           <CardHeader>
             <CardTitle>Login to your account</CardTitle>
             <CardDescription>
-              Enter your details below to login to your account
+              Enter your details below to login
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="flex flex-col gap-6">
-              {/* Success Message */}
-              {successMessage && (
-                <div className="p-3 rounded-md bg-green-50 border border-green-200">
-                  <p className="text-sm text-green-600">{successMessage}</p>
-                </div>
-              )}
 
-              {/* General Error Message */}
-              {errors.general && (
-                <div className="p-3 rounded-md bg-red-50 border border-red-200">
-                  <p className="text-sm text-red-600">{errors.general}</p>
-                </div>
-              )}
+          <CardContent className="space-y-4">
+            {successMessage && (
+              <p className="text-sm text-green-600">{successMessage}</p>
+            )}
+            {errors.general && (
+              <p className="text-sm text-red-600">{errors.general}</p>
+            )}
 
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
+            <div>
+              <Label>Email</Label>
+              <Input
+                name="email"
+                value={loginData.email}
+                onChange={handleInputChange}
+              />
+            </div>
+
+            <div>
+              <Label>Password</Label>
+              <div className="relative">
                 <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  placeholder="m@example.com"
-                  value={loginData.email}
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  value={loginData.password}
                   onChange={handleInputChange}
-                  className={errors.email ? "border-red-500" : ""}
-                  required
                 />
-                {errors.email && (
-                  <p className="text-sm text-red-500">{errors.email}</p>
-                )}
-              </div>
-
-              <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
-                  <a
-                    href="#"
-                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                  >
-                    Forgot password?(Upcoming)
-                  </a>
-                </div>
-                <div className="relative">
-                  <Input
-                    id="password"
-                    name="password"
-                    type={showPassword ? "text" : "password"}
-                    value={loginData.password}
-                    onChange={handleInputChange}
-                    className={errors.password ? "border-red-500" : ""}
-                    required
-                  />
-                  <button
-                    type="button"
-                    className="absolute right-2 top-1/2 -translate-y-1/2 text-sm text-gray-500 hover:text-gray-800"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? "Hide" : "Show"}
-                  </button>
-                </div>
-                {errors.password && (
-                  <p className="text-sm text-red-500">{errors.password}</p>
-                )}
-              </div>
-
-              <div className="grid gap-2">
-                <Label htmlFor="role">Role</Label>
-                <select
-                  id="role"
-                  name="role"
-                  value={loginData.role}
-                  onChange={handleInputChange}
-                  className={`flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 ${
-                    errors.role ? "border-red-500" : ""
-                  }`}
-                  required
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-sm"
                 >
-                  <option value="">Select your role</option>
-                  <option value="account">Accounts</option>
-                  <option value="faculty">Faculty</option>
-                  <option value="library">Library</option>
-                  <option value="student">Student</option>
-                  <option value="registrar">Registrar</option>
-                  <option value="exam-controller">Exam controller</option>
-                </select>
-                {errors.role && (
-                  <p className="text-sm text-red-500">{errors.role}</p>
-                )}
+                  {showPassword ? "Hide" : "Show"}
+                </button>
               </div>
+            </div>
+
+            <div>
+              <Label>Role</Label>
+              <select
+                name="role"
+                value={loginData.role}
+                onChange={handleInputChange}
+                className="w-full h-9 rounded-md border px-3 text-sm"
+              >
+                <option value="">Select role</option>
+                <option value="account">Accounts</option>
+                <option value="faculty">Faculty</option>
+                <option value="library">Library</option>
+                <option value="student">Student</option>
+                <option value="registrar">Registrar</option>
+                <option value="exam-controller">Exam Controller</option>
+              </select>
             </div>
           </CardContent>
-          <CardFooter className="flex-col gap-2">
-            <Button
-  type="submit"
-  className="w-full flex items-center justify-center gap-2"
-  onClick={handleSubmit}
-  disabled={isLoading}
->
-  {isLoading ? (
-    <>
-      <Spinner />
-      <span>Signing in...</span>
-    </>
-  ) : (
-    "Login"
-  )}
-</Button>
 
-            <div className="text-center text-sm">
-              Are you student? Only student can create an account. <br />
-              Don't have an account?{" "}
-              <a
-                href="/registration"
-                className="underline underline-offset-4 text-blue-600 hover:text-blue-800"
-              >
-                Sign up
-              </a>
-            </div>
+          <CardFooter>
+            <Button
+              className="w-full flex items-center gap-2"
+              onClick={handleSubmit}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <Spinner /> Signing in...
+                </>
+              ) : (
+                "Login"
+              )}
+            </Button>
           </CardFooter>
         </Card>
       </div>

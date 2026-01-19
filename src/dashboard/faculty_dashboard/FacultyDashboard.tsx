@@ -196,7 +196,7 @@ const FacultyDashboard = ({ dashboard, url }: FacultyDashboardProps) => {
                 {/* Details Section */}
                 <div className="space-y-3 text-xs">
                   <div className="bg-gray-50 p-2 rounded-lg">
-                    <p className="text-gray-500 mb-1">Library ID</p>
+                    <p className="text-gray-500 mb-1">Faculty ID</p>
                     <p className="font-semibold text-gray-900">
                       {facultyInfo.facultyId}
                     </p>
