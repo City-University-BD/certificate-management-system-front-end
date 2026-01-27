@@ -16,114 +16,134 @@ import SSLPaymentPage from "./pages/payment/SSLPaymentPage";
 import Registration from "./pages/RegistrationPage/Registration";
 import AccountDashboard from "./dashboard/account_dashboard/AccountDashboard";
 import LibraryDashboard from "./dashboard/library dashboard/libraryDashboard";
+import PrivateRoute from "./routes/PrivateRoutes";
 
 function App() {
   return (
-    <div>
-      <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/registration" element={<Registration />} />
+   <div>
+  <Routes>
+    <Route path="/" element={<Login />} />
+    <Route path="/registration" element={<Registration />} />
 
-        <Route path="/student-dashboard" element={<StudentDashboard />}>
-          <Route index element={<StudentInfo />} />
-          <Route path="certificate" element={<CertificateApplicationForm />} />
-          <Route path="status" element={<StatusCheck />} />
-          <Route path="payment" element={<SSLPaymentPage />} />
-        </Route>
+    {/* 🔐 STUDENT */}
+    <Route element={<PrivateRoute />}>
+      <Route path="/student-dashboard" element={<StudentDashboard />}>
+        <Route index element={<StudentInfo />} />
+        <Route path="certificate" element={<CertificateApplicationForm />} />
+        <Route path="status" element={<StatusCheck />} />
+        <Route path="payment" element={<SSLPaymentPage />} />
+      </Route>
+    </Route>
 
+    {/* 🔐 EXAM CONTROLLER */}
+    <Route element={<PrivateRoute />}>
+      <Route
+        path="/exam-controller-dashboard"
+        element={<ExamControllerDashboard />}
+      >
+        <Route index element={<ExamControllerApplicationList />} />
         <Route
-          path="/exam-controller-dashboard"
-          element={<ExamControllerDashboard />}
-        >
-          <Route index element={<ExamControllerApplicationList />} />
-          <Route
-            path="approved-applications"
-            element={<ApprovedApplication />}
-          />
-          <Route
-            path="application/:id"
-            element={<ApplicationDetails role={"examController"} />}
-          />
-
-          <Route
-            path="approved-applications/application/:id"
-            element={<ApplicationDetails role={"examController"} />}
-          />
-        </Route>
-
+          path="approved-applications"
+          element={<ApprovedApplication />}
+        />
         <Route
-          path="/faculty-dashboard"
+          path="application/:id"
+          element={<ApplicationDetails role="examController" />}
+        />
+        <Route
+          path="approved-applications/application/:id"
+          element={<ApplicationDetails role="examController" />}
+        />
+      </Route>
+    </Route>
+
+    {/* 🔐 FACULTY */}
+    <Route element={<PrivateRoute />}>
+      <Route
+        path="/faculty-dashboard"
+        element={
+          <FacultyDashboard
+            dashboard="Faculty Dashboard"
+            url="/faculty-dashboard"
+          />
+        }
+      >
+        <Route
+          index
+          element={<ApplicationsList role="faculty" url="/faculty-dashboard" />}
+        />
+        <Route
+          path="application/:id"
+          element={<ApplicationDetails role="faculty" />}
+        />
+      </Route>
+    </Route>
+
+    {/* 🔐 ACCOUNTS */}
+    <Route element={<PrivateRoute />}>
+      <Route path="/accounts-dashboard" element={<AccountDashboard />}>
+        <Route
+          index
           element={
-            <FacultyDashboard
-              dashboard={"Faculty Dashboard"}
-              url={"/faculty-dashboard"}
+            <ApplicationsList role="accounts" url="/accounts-dashboard" />
+          }
+        />
+        <Route
+          path="application/:id"
+          element={<ApplicationDetails role="accounts" />}
+        />
+      </Route>
+    </Route>
+
+    {/* 🔐 LIBRARY */}
+    <Route element={<PrivateRoute />}>
+      <Route path="/library-dashboard" element={<LibraryDashboard />}>
+        <Route
+          index
+          element={
+            <ApplicationsList role="library" url="/library-dashboard" />
+          }
+        />
+        <Route
+          path="application/:id"
+          element={<ApplicationDetails role="library" />}
+        />
+      </Route>
+    </Route>
+
+    {/* 🔐 REGISTRAR */}
+    <Route element={<PrivateRoute />}>
+      <Route
+        path="/registrar-dashboard"
+        element={
+          <RegistrarDashboard
+            dashboard="Registrar Dashboard"
+            url="/registrar-dashboard"
+          />
+        }
+      >
+        <Route
+          index
+          element={
+            <ApplicationsList
+              role="registrar"
+              url="/registrar-dashboard"
             />
           }
-        >
-          <Route
-            index
-            element={
-              <ApplicationsList role={"faculty"} url={"/faculty-dashboard"} />
-            }
-          />
-          <Route
-            path="application/:id"
-            element={<ApplicationDetails role={"faculty"} />}
-          />
-        </Route>
-        <Route path="/accounts-dashboard" element={<AccountDashboard />}>
-          <Route
-            index
-            element={
-              <ApplicationsList role={"accounts"} url={"/accounts-dashboard"} />
-            }
-          />
-          <Route
-            path="application/:id"
-            element={<ApplicationDetails role={"accounts"} />}
-          />
-        </Route>
-
-        <Route path="/library-dashboard" element={<LibraryDashboard />}>
-          <Route
-            index
-            element={
-              <ApplicationsList role={"library"} url={"/library-dashboard"} />
-            }
-          />
-          <Route
-            path="application/:id"
-            element={<ApplicationDetails role={"library"} />}
-          />
-        </Route>
+        />
         <Route
-          path="/registrar-dashboard"
-          element={
-            <RegistrarDashboard
-              dashboard={"Registrar Dashboard"}
-              url={"/registrar-dashboard"}
-            />
-          }
-        >
-          <Route
-            index
-            element={
-              <ApplicationsList
-                role={"registrar"}
-                url={"/registrar-dashboard"}
-              />
-            }
-          />
-          <Route
-            path="application/:id"
-            element={<ApplicationDetails role={"registrar"} />}
-          />
-        </Route>
+          path="application/:id"
+          element={<ApplicationDetails role="registrar" />}
+        />
+      </Route>
+    </Route>
 
-        <Route path="/certificate" element={<CertificateApplicationForm />} />
-        <Route path="/download-details/:id" element={<DownloadDetails />} />
-      </Routes>
-    </div>
+    {/* PUBLIC */}
+    <Route path="/certificate" element={<CertificateApplicationForm />} />
+    <Route path="/download-details/:id" element={<DownloadDetails />} />
+  </Routes>
+</div>
+
   );
 }
 
