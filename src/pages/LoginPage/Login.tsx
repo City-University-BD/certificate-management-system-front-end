@@ -11,7 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
-import { Link, Navigate, useLocation, useNavigate } from "react-router";
+import { Link, Navigate, useNavigate } from "react-router";
 
 interface LoginData {
   email: string;
@@ -38,15 +38,24 @@ const Login: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-//   const userData = localStorage.getItem("userData");
-// const userRole = localStorage.getItem("userRole");
-// const user = userData ? JSON.parse(userData) : null;
+  const userData = localStorage.getItem("userData");
+const userRole = localStorage.getItem("userRole");
+const user = userData ? JSON.parse(userData) : null;
 
 const navigate = useNavigate();
 
-// if (user && userRole) {
-//   return <Navigate to={getDashboardRoute(userRole)} replace />;
-// }
+const roleRoutes: Record<string, string> = {
+  account: "/accounts-dashboard",
+  registrar: "/registrar-dashboard",
+  faculty: "/faculty-dashboard",
+  library: "/library-dashboard",
+  student: "/student-dashboard",
+  "exam-controller": "/exam-controller-dashboard",
+};
+
+if (user && userRole) {
+  return <Navigate to={roleRoutes[userRole] || "/"} replace />;
+}
 
 
   /* ================= ROLE WISE DEMO CREDENTIALS ================= */
