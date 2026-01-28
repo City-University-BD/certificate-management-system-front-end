@@ -11,7 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
-import { useNavigate } from "react-router";
+import { Link, Navigate, useLocation, useNavigate } from "react-router";
 
 interface LoginData {
   email: string;
@@ -38,7 +38,16 @@ const Login: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const navigate = useNavigate();
+//   const userData = localStorage.getItem("userData");
+// const userRole = localStorage.getItem("userRole");
+// const user = userData ? JSON.parse(userData) : null;
+
+const navigate = useNavigate();
+
+// if (user && userRole) {
+//   return <Navigate to={getDashboardRoute(userRole)} replace />;
+// }
+
 
   /* ================= ROLE WISE DEMO CREDENTIALS ================= */
   const roleCredentials: Record<string, { email: string; password: string }> = {
@@ -207,7 +216,7 @@ const Login: React.FC = () => {
           </p>
         </div>
 
-        <Card>
+        <Card className="shadow-lg border border-gray-200">
           <CardHeader>
             <CardTitle>Login to your account</CardTitle>
             <CardDescription>
@@ -285,6 +294,16 @@ const Login: React.FC = () => {
               )}
             </Button>
           </CardFooter>
+          <div className="text-center text-sm text-gray-600">
+  Don’t have an account?{" "}
+  <Link
+    to="/registration"
+    className="text-blue-600 hover:underline font-medium"
+  >
+    Register here
+  </Link>
+</div>
+
         </Card>
       </div>
     </div>
